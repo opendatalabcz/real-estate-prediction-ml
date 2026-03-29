@@ -1,7 +1,8 @@
+from sklearn.feature_selection import SelectFromModel
 import numpy as np
-from sklearn.base import BaseEstimator, TransformerMixin
-from typing import List
 import pandas as pd
+from sklearn.base import BaseEstimator, TransformerMixin
+from typing import List, Optional
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import (
@@ -11,41 +12,70 @@ from sklearn.preprocessing import (
     FunctionTransformer
 )
 from sklearn.impute import SimpleImputer
+from sklearn.base import BaseEstimator, RegressorMixin
+import unicodedata
+from sklearn.base import BaseEstimator, TransformerMixin
+import pandas as pd
+from sklearn.impute import KNNImputer
 
 
-def fill_total_area(X):
-    """Custom function to fill total_area with usable_area if missing."""
-    X = X.copy()
-    if 'total_area_m2' in X.columns and 'usable_area_m2' in X.columns:
-        X['total_area_m2'] = X['total_area_m2'].fillna(X['usable_area_m2'])
-    return X
+class PandasCategoryCaster(BaseEstimator, TransformerMixin):
+    """
+    Sanitizes strings to ASCII and casts columns to pandas 'category' dtype.
+    This prevents XGBoost UnicodeDecodeErrors on prediction.
+    """
 
+    def fit(self, X, y=None):
+        return self
 
-def identity_feature_names(transformer, input_features):
-    return input_features
+    def _sanitize_string(self, text):
+        if not isinstance(text, str):
+            return text
+
+        text = unicodedata.normalize('NFKD', text)
+
+        text = text.encode('ascii', 'ignore').decode('utf-8')
+
+        return text.strip().lower().replace(" ", "_").replace("-", "_")
+
+    def transform(self, X):
+        X_cat = X.copy()
+        for col in X_cat.columns:
+            # First, sanitize the strings
+            X_cat[col] = X_cat[col].apply(self._sanitize_string)
+            # Then cast to category
+            X_cat[col] = X_cat[col].astype('category')
+        return X_cat
+
+    def get_feature_names_out(self, input_features=None):
+        return input_features
 
 
 class SmoothedTargetEncoder(BaseEstimator, TransformerMixin):
+    """Generically target-encodes a single categorical feature."""
+
     def __init__(self, smoothing=20):
         self.smoothing = smoothing
         self.mapping_ = None
         self.global_mean_ = None
 
     def fit(self, X, y):
-        X = pd.DataFrame(X, columns=["district_id"])
+        if isinstance(X, pd.DataFrame):
+            X_series = X.iloc[:, 0]
+        else:
+            X_series = pd.Series(X.ravel())
         y = pd.Series(y)
 
         self.global_mean_ = y.mean()
 
         stats = (
-            pd.DataFrame({"district_id": X["district_id"], "price_total": y})
-            .groupby("district_id", observed=True)["price_total"]
+            pd.DataFrame({"cat_feature": X_series, "target": y})
+            .groupby("cat_feature", observed=True)["target"]
             .agg(["mean", "count"])
         )
 
         smooth = (
-            (stats["count"] * stats["mean"] +
-             self.smoothing * self.global_mean_)
+            (stats["count"] * stats["mean"] + self.smoothing * self.global_mean_)
             / (stats["count"] + self.smoothing)
         )
 
@@ -53,135 +83,158 @@ class SmoothedTargetEncoder(BaseEstimator, TransformerMixin):
         return self
 
     def transform(self, X):
-        X = pd.DataFrame(X, columns=["district_id"])
-        encoded = X["district_id"].map(self.mapping_)
+        if isinstance(X, pd.DataFrame):
+            X_series = X.iloc[:, 0]
+        else:
+            X_series = pd.Series(X.ravel())
+
+        encoded = X_series.map(self.mapping_)
+        encoded = encoded.astype(float)
         encoded = encoded.fillna(self.global_mean_)
         return encoded.to_frame()
 
+    def get_feature_names_out(self, input_features=None):
+        """Passes the input feature names straight through."""
+        return input_features
 
-def get_ordinal_pipeline(
+
+def get_pipeline(
     num_features: List[str],
+    cat_features: List[str],
+    structural_features: List[str],
     bool_features: List[str],
+    ordinal_features: List[str] = None,
+    ordinal_categories: List[List[str]] = None,
+    target_encoded_features: List[str] = None,
     model_type: str = "tree"
-) -> Pipeline:
-    """
-    Returns preprocessing pipeline with:
-    - Custom total_area imputation
-    - Ordinal encoding for energy_class
-    - One-hot for nominal categoricals
-    - Proper scaling depending on model type
-    """
 
-    if model_type not in {"tree", "linear"}:
+
+) -> Pipeline:
+    """Returns a generalized preprocessing pipeline."""
+
+    if model_type not in {"tree", "linear", "tree_modern"}:
         raise ValueError("model_type must be 'tree' or 'linear'")
 
-    area_imputer = FunctionTransformer(
-        fill_total_area,
-        validate=False,
-        feature_names_out=identity_feature_names  # <--- ADD THIS
-    )
+    transformers = []
 
-    num_steps = [
-        ("imputer", SimpleImputer(strategy="median"))
-    ]
+    if num_features:
+        num_steps = [("imputer", SimpleImputer(strategy="median"))]
+        if model_type == "linear":
+            num_steps.append(("scaler", StandardScaler()))
+        transformers.append(("num", Pipeline(num_steps), num_features))
 
-    if model_type == "linear":
-        num_steps.append(("scaler", StandardScaler()))
+    if cat_features:
+        cat_steps = [("imputer", SimpleImputer(strategy="most_frequent"))]
 
-    num_transformer = Pipeline(steps=num_steps)
-
-    energy_categories = ["G", "F", "E", "D", "C", "B", "A", "missing"]
-
-    energy_steps = [
-        ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
-        (
-            "ordinal",
-            OrdinalEncoder(
-                categories=[energy_categories],
+        if model_type == "linear":
+            cat_steps.append(("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)))
+        elif model_type == "tree":
+            cat_steps.append(("ordinal", OrdinalEncoder(
+                categories="auto",
                 handle_unknown="use_encoded_value",
                 unknown_value=-1
-            ),
-        ),
-    ]
+            )))
+        else:
+            cat_steps.append(("caster", PandasCategoryCaster()))
 
-    if model_type == "linear":
-        energy_steps.append(("scaler", StandardScaler()))
+        transformers.append(("cat", Pipeline(cat_steps), cat_features))
 
-    energy_transformer = Pipeline(steps=energy_steps)
-
-    other_cat_features = [
-        "category_sub",
-        "locality_region_id",
-        "construction_type",
-        "building_condition",
-        "ownership_type",
-        "location_type",
-        "is_furnished",
-    ]
-    district_transformer = Pipeline([
-        ("target_mean", SmoothedTargetEncoder(smoothing=5))
-    ])
-
-    cat_transformer = Pipeline(
-        steps=[
-            ("imputer", SimpleImputer(strategy="most_frequent")),
-            (
-                "onehot",
-                OneHotEncoder(
-                    handle_unknown="ignore",
-                    sparse_output=(model_type == "tree")
-                ),
-            ),
+    if bool_features:
+        bool_steps = [
+            ("to_int", FunctionTransformer(lambda x: x.astype(int), feature_names_out="one-to-one")),
+            ("imputer", SimpleImputer(strategy="constant", fill_value=0)),
         ]
-    )
+        transformers.append(("bool", Pipeline(bool_steps), bool_features))
 
-    bool_transformer = Pipeline(
-        steps=[
-            ("to_int", FunctionTransformer(lambda x: x.astype(int))),
-            ("imputer", SimpleImputer(strategy="most_frequent")),
+    if ordinal_features and ordinal_categories:
+        ordinal_steps = [
+            ("imputer", SimpleImputer(strategy="constant", fill_value="missing")),
+            ("ordinal", OrdinalEncoder(categories=ordinal_categories, handle_unknown="use_encoded_value", unknown_value=-1)),
         ]
-    )
+        if model_type == "linear":
+            ordinal_steps.append(("scaler", StandardScaler()))
+        transformers.append(("ordinal", Pipeline(ordinal_steps), ordinal_features))
+    if structural_features:
+        structural_transformer = Pipeline(steps=[
+            ('imputer', KNNImputer(n_neighbors=5)),
+            ('scaler', StandardScaler())
+        ])
+    if target_encoded_features:
+        for feature in target_encoded_features:
+            te_pipe = Pipeline([("target_mean", SmoothedTargetEncoder(smoothing=5))])
+            transformers.append((f"te_{feature}", te_pipe, [feature]))
 
     preprocessor = ColumnTransformer(
-        transformers=[
-            ("num", num_transformer, num_features),
-            ("energy", energy_transformer, ["energy_class"]),
-            ("cat", cat_transformer, other_cat_features),
-            ("bool", bool_transformer, bool_features),
-            ("district", district_transformer, ["district_id"])
-        ],
+        transformers=transformers,
         remainder="drop",
-        verbose_feature_names_out=False
-    )
+        verbose_feature_names_out=True
+    ).set_output(transform="pandas")
 
-    return Pipeline(
-        steps=[
-            ("area_fill", area_imputer),
-            ("preprocessing", preprocessor),
-        ]
-    )
+    return Pipeline(steps=[("preprocessing", preprocessor)])
 
 
-class Model_pipeline:
-    def __init__(self, num_features: List[str], bool_features: List[str], model_type: str = "tree", model=None):
-        self.pipeline = Pipeline(
-            steps=[
-                ("preprocessing", get_ordinal_pipeline(num_features, bool_features, model_type)),
-                ("model", model)
-            ]
+class Model_pipeline(BaseEstimator, RegressorMixin):
+    """
+    A scikit-learn compatible wrapper that binds a dynamic preprocessor
+    to a specific model estimator.
+    """
+
+    def __init__(self, config: dict, model_type: str = "tree", model=None, use_selection=False):
+        self.config = config
+        self.model_type = model_type
+        self.model = model
+        self.use_selection = use_selection
+        self._build_pipeline()
+
+    def _build_pipeline(self):
+        """Constructs a flattened pipeline from the config and model."""
+        preprocessor_pipe = get_pipeline(
+            num_features=self.config.get("num_features", []),
+            cat_features=self.config.get("cat_features", []),
+            structural_features=self.config.get("structural_features", []),
+            bool_features=self.config.get("bool_features", []),
+            ordinal_features=self.config.get("ordinal_features", []),
+            ordinal_categories=self.config.get("ordinal_categories", []),
+            target_encoded_features=self.config.get("target_encoded_features", []),
+            model_type=self.model_type
         )
+        preprocessor_step = preprocessor_pipe.steps[0]
+        steps = [
+            preprocessor_step,
+        ]
+        if self.use_selection:
+            selector = SelectFromModel(estimator=self.model, threshold="median")
+            steps.append(("selection", selector))
+        steps.append(("model", self.model))
+        self.pipeline_ = Pipeline(steps=steps)
 
-    def fit(self, X, y):
-        self.pipeline.fit(X, y)
+    def fit(self, X, y, **kwargs):
+        """Fits the underlying preprocessing steps and the model."""
+        self.pipeline_.fit(X, y, **kwargs)
         return self
 
     def predict(self, X):
-        return self.pipeline.predict(X)
+        """Transforms the data and returns model predictions."""
+        return self.pipeline_.predict(X)
 
-    def get_score(self, X, y, scoring, scale_back=False):
+    def get_score(self, X, y, scoring_func, scale_back=False, clip_max=None):
+        """
+        Calculates the score using the provided scoring_func.
+
+        Parameters:
+        - scoring_func: A callable like root_mean_squared_error
+        - scale_back: If True, reverses log1p transformation via expm1
+        - clip_max: Optional upper bound to prevent overflow during expm1
+        """
         y_pred = self.predict(X)
-        if scale_back:
-            y = np.expm1(y.copy())
-            y_pred = np.expm1(y_pred.copy())
 
-        return scoring(y, y_pred)
+        if scale_back:
+            y_true_raw = np.expm1(y.copy())
+            if clip_max is not None:
+                y_pred = np.clip(y_pred, a_min=0, a_max=clip_max)
+            else:
+                y_pred = np.clip(y_pred, a_min=0, a_max=700)
+            y_pred_raw = np.expm1(y_pred)
+            return scoring_func(y_true_raw, y_pred_raw)
+
+        return scoring_func(y, y_pred)

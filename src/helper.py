@@ -30,27 +30,36 @@ from sklearn.model_selection import GridSearchCV
 from src.process import process_df
 
 
-def remove_outliers(df: pd.DataFrame, th: int = 0.9995) -> pd.DataFrame:
-    # Define columns to clean and their upper quantile threshold
-    # Lower quantile is kept at 0 unless you want to remove 0-price listings
+def remove_outliers(df: pd.DataFrame, th: int = 0.995):
+    df_clean = df.copy()
+
+    # 1. Create temporary Price per m2 feature
+    # We use a small epsilon (1e-6) to avoid division by zero errors
+    df_clean['price_per_m2'] = df_clean['price_total'] / (df_clean['usable_area_m2'] + 1e-6)
+
     thresholds = {
-        'price_total': th,
-        'usable_area_m2': th
+        'price_per_m2': th,
+        # 'usable_area_m2': th  # Keep area to catch typos like 10,000m2 for an apartment
     }
 
-    df_clean = df.copy()
+    is_outlier = pd.Series(False, index=df_clean.index)
 
     for col, q in thresholds.items():
         if col in df_clean.columns:
             upper_limit = df_clean[col].quantile(q)
-            lower_limit = df_clean[col].quantile(0.0005)
+            lower_limit = df_clean[col].quantile(0.00001)
 
-            df_clean = df_clean[
-                (df_clean[col] >= lower_limit) &
-                (df_clean[col] <= upper_limit)
-            ]
+            is_outlier |= (df_clean[col] < lower_limit) | (df_clean[col] > upper_limit)
 
-    return df_clean
+    # 2. Extract outliers and clean dataframe
+    outliers = df_clean[is_outlier].copy()
+    df_final = df_clean[~is_outlier].copy()
+
+    # Drop the temporary helper column so it doesn't mess up your model training
+    df_final = df_final.drop(columns=['price_per_m2'])
+
+    print(f"Removed {len(outliers)} rows as outliers based on valuation and size.")
+    return df_final, outliers
 
 
 def plot_regression_enhanced(y_true_log, y_pred_log):
@@ -72,6 +81,50 @@ def plot_regression_enhanced(y_true_log, y_pred_log):
                    fontsize=12, verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
 
     plt.title('Real vs Predicted (with Metrics)')
+    plt.xlabel('Actual Price')
+    plt.ylabel('Predicted Price')
+    plt.show()
+
+
+def plot_regression_enhanced_t(y_true_log, y_pred_log, train_log_mse):
+    """
+    Plots real vs predicted prices with Jensen's Inequality correction.
+
+    Args:
+        y_true_log: Actual log prices (Test/Val)
+        y_pred_log: Predicted log prices (Test/Val)
+        train_log_mse: The variance of residuals calculated from the TRAINING set
+    """
+    y_true = np.expm1(y_true_log)
+    y_pred = np.expm1(y_pred_log)
+
+    corrected_preds = np.expm1(y_pred_log + (train_log_mse / 2))
+
+    r2_naive = r2_score(y_true, y_pred)
+    mae_naive = mean_absolute_error(y_true, y_pred)
+    r2_adj = r2_score(y_true, corrected_preds)
+    mae_adj = mean_absolute_error(y_true, corrected_preds)
+
+    plt.figure(figsize=(10, 6))
+
+    sns.scatterplot(x=y_true, y=corrected_preds, alpha=0.5, color='teal')
+
+    max_val = max(y_true.max(), corrected_preds.max())
+    plt.plot([0, max_val], [0, max_val], color='red', lw=2, linestyle='--')
+
+    # Stats box
+    stats_text = (
+        f'--- NAIVE ---\n'
+        f'R²: {r2_naive:.5f} | MAE: ${mae_naive:,.0f}\n\n'
+        f'--- CORRECTED ---\n'
+        f'R²: {r2_adj:.5f} | MAE: ${mae_adj:,.0f}'
+    )
+
+    plt.gca().text(0.05, 0.95, stats_text, transform=plt.gca().transAxes,
+                   fontsize=11, verticalalignment='top',
+                   bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+
+    plt.title('Real vs Predicted (Variance Corrected)')
     plt.xlabel('Actual Price')
     plt.ylabel('Predicted Price')
     plt.show()
