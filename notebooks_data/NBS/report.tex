@@ -1,0 +1,223 @@
+\section{Implementace webové aplikace}
+
+Tato kapitola popisuje architekturu a implementaci webové aplikace
+pro odhad nabídkových cen bytů. Aplikace byla vyvinuta v rámci
+bakalářské práce na Fakultě informačních technologií ČVUT ve
+spolupráci s laboratoří OpenDataLab.
+
+\subsection{Architektura}
+
+Aplikace je postavena na frameworku Flask (verze 3.0) a
+komunikuje s uživatelem prostřednictvím webového rozhraní.
+Po natrénování modelu XGBoost a jeho serializaci do formátu
+Joblib je model načten při startu aplikace a následně
+používán k predikci cen na základě uživatelem zadaných
+parametrů nemovitosti.
+
+Hlavní komponenty aplikace:
+
+\begin{itemize}
+    \item \texttt{app.py} \--- vstupní bod Flask aplikace,
+          definice rout a zpracování HTTP požadavků.
+    \item \texttt{src/predict\_loader.py} \--- načtení
+          serializovaného pipeline modelu, správa POI
+          (Points of Interest) modulu a samotná predikce
+          včetně výpočtu SHAP hodnot.
+    \item \texttt{src/process.py} \--- předzpracování
+          vstupních dat, odvození nových příznaků
+          (např. poměr podlaží, stáří budovy, plocha
+          na místnost) a typová konverze.
+    \item \texttt{src/pipe.py} \--- vlastní
+          scikit-learn transformery včetně
+          \texttt{SmoothedTargetEncoder} a
+          \texttt{PandasCategoryCaster} pro převod
+          řetězců na ASCII kategorie.
+    \item \texttt{src/poi\_helper.py} \--- výpočet
+          polohových příznaků pomocí BallTree
+          (vzdálenost k MHD, obchodům, centru kraje).
+\end{itemize}
+
+Aplikace je rozdělena do dvou adresářových struktur:
+kořenový adresář a adresář \texttt{app/}, který obsahuje
+samostatnou kopii pro nasazení do kontejneru Docker.
+Při každé změně zdrojových souborů je nutné upravit obě
+kopie.
+
+\subsection{Zpracování vstupních dat}
+
+Uživatel zadává parametry nemovitosti prostřednictvím
+formuláře a interaktivní mapy. Vstupní data procházejí
+následujícím zpracovatelským řetězcem:
+
+\begin{enumerate}
+    \item \textbf{Sestavení DataFrame} \--- z formuláře
+          a souřadnic z mapy je vytvořen řádek se všemi
+          vstupními příznaky.
+    \item \textbf{Ořezání odlehlých hodnot} \--- aplikace
+          omezí hodnoty na intervaly definované
+          v \texttt{cleaning\_params.joblib}.
+    \item \textbf{Polohové příznaky} \--- na základě
+          zeměpisných souřadnic a ID kraje jsou pomocí
+          BallTree vypočteny vzdálenosti a počty
+          zastávek MHD, obchodů a vzdálenost
+          k centru kraje (celkem 25 polohových
+          příznaků).
+    \item \textbf{Procesní funkce} \--- \texttt{process\_df}
+          mapuje kategorii dispozice (např. 1+kk na 1),
+          dopočítá odvozené příznaky (stáří budovy,
+          poměr podlaží, plochu na místnost,
+          interakce kraj--dispozice a kraj--stav).
+    \item \textbf{Pipeline modelu} \--- předzpracovaná
+          data vstupují do ColumnTransformer s 10
+          transformátory (mediánová imputace,
+          frekvenční imputace s ordinálním kódováním,
+          KNN imputace, cílové kódování).
+    \item \textbf{Predikce} \--- XGBoost regresor
+          (300 stromů, maximální hloubka 6)
+          obalený v \texttt{TransformedTargetRegressor}
+          s logaritmickou transformací cílové proměnné.
+\end{enumerate}
+
+Predikce je vrácena v JSON formátu a zobrazena uživateli
+spolu s cenou za metr čtvereční a konfidenčním intervalem
+odvozeným metodou konformní predikce.
+
+\subsection{Uživatelské rozhraní}
+
+Uživatelské rozhraní je navrženo podle principů Material
+Design 3 s vlastní CSS implementací (bez frameworkových
+CDN). Skládá se ze tří hlavních částí:
+
+\begin{itemize}
+    \item \textbf{Formulář} \--- rozdělen do sekcí
+          Lokalita, Dispozice, Stav budovy a Vybavení.
+          Každá sekce obsahuje příslušné vstupní prvky
+          (select, input, přepínače).
+    \item \textbf{Mapa} \--- využívá knihovnu Leaflet
+          s dlaždicemi OpenStreetMap. Kliknutím na mapu
+          uživatel umístí značku a aplikace pomocí
+          Turf.js detekuje okres (okresní polygon)
+          a předvyplní příslušné selectory.
+          Hranice okresů jsou načteny z GeoJSON souboru
+          získaného z Overpass API.
+    \item \textbf{Výsledek} \--- zobrazuje odhadovanou
+          cenu, cenu za m\textsuperscript{2},
+          konfidenční interval a grafické znázornění
+          vlivu jednotlivých parametrů pomocí SHAP
+          waterfall grafu (Plotly.js).
+\end{itemize}
+
+Formulář obsahuje validační logiku na straně klienta
+(kontrola, zda užitná plocha nepřesahuje celkovou,
+a zda podlaží nepřesahuje celkový počet pater).
+Při výběru kraje se filtr okresů automaticky omezí
+na příslušný kraj a mapa se přesune do jeho středu.
+
+\subsection{Model a jeho nasazení}
+
+Natrénovaný model XGBoost je serializován společně
+s celým předzpracovatelským pipeline do souboru
+\texttt{tuned\_xgb\_pipeline.joblib}. Pipeline
+obsahuje tyto transformace:
+
+\begin{itemize}
+    \item \textbf{Numerické příznaky}: latitude,
+          longitude, floor\_ratio, area\_per\_room,
+          building\_age \--- mediánová imputace.
+    \item \textbf{Log-numerické příznaky}:
+          usable\_area\_m2, total\_area\_m2,
+          loggia\_area\_m2, cellar\_area\_m2
+          \--- mediánová imputace.
+    \item \textbf{Kategorické příznaky}:
+          category\_sub, construction\_type,
+          ownership\_type, is\_furnished,
+          location\_type \--- frekvenční imputace
+          a ordinální kódování.
+    \item \textbf{Ordinální příznaky}:
+          energy\_class, building\_condition,
+          locality\_region\_id \--- imputace
+          a ordinální kódování s explicitním
+          pořadím kategorií.
+    \item \textbf{Strukturální příznaky}:
+          floor\_number, total\_floors \---
+          KNN imputace (5 sousedů).
+    \item \textbf{Cílově kódované příznaky}:
+          district\_id, construction\_year,
+          region\_category, region\_condition
+          \--- SmoothedTargetEncoder
+          (smoothing=5).
+\end{itemize}
+
+XGBoost regresor je nakonfigurován s parametry:
+300 estimatorů, maximální hloubka 6, learning rate
+0,05. Cílová proměnná je transformována logaritmem
+(zpětná transformace exponenciálou), což odpovídá
+multiplikativnímu charakteru cen.
+
+\subsection{Interpretovatelnost predikcí}
+
+Pro vysvětlení jednotlivých predikcí je použita
+metoda SHAP (SHapley Additive exPlanations).
+Po provedení predikce jsou vypočteny SHAP příspěvky
+pro každý vstupní příznak. Příspěvky jsou
+převedeny na multiplikativní formát, který
+uživateli srozumitelně ukazuje, o kolik procent
+každý parametr zvyšuje nebo snižuje cenu oproti
+průměru. Vizualizace je realizována jako
+vodopádový graf (waterfall chart) pomocí knihovny
+Plotly.js.
+
+\subsection{Konfidenční interval}
+
+Pro kvantifikaci nejistoty predikce je použit
+konformní predikční interval. Z testovacích dat
+je spočten 80. percentil absolutních reziduí
+na logaritmické škále. Výsledná hodnota
+\(q_{80} = 0{,}1257\) odpovídá konfidenčnímu
+intervalu přibližně \(\pm 13{,}4\,\%\).
+Interval je symetrický na logaritmické škále,
+což znamená, že jeho absolutní šířka roste
+s rostoucí cenou -- tento vlastnost je v souladu
+s heteroskedasticitou reziduí.
+
+\subsection{Data a datové zdroje}
+
+Trénovací data pocházejí z portálu sreality.cz,
+odkud byla získána pomocí vlastního scraperu
+implementovaného v modulu \texttt{src/main.py}.
+Scraper nejprve získává seznam inzerátů
+z API portálu a následně stahuje detailní
+informace o každé nemovitosti.
+
+Polohová data zahrnují:
+
+\begin{itemize}
+    \item Zastávky MHD (hromadná doprava, metro,
+          vlak, tramvaj, autobus).
+    \item Obchody (supermarkety a večerky).
+    \item Centra krajů (pro výpočet vzdálenosti).
+    \item Hranice okresů (z OpenStreetMap přes
+          Overpass API).
+\end{itemize}
+
+Mapování 87 hodnot \texttt{district\_id} na názvy
+okresů a příslušnost ke krajům je uloženo
+v CSV souborech. Hranice okresů jsou
+zjednodušeny pro účely webové vizualizace
+(Douglas-Peucker, redukce na 15~\% bodů).
+
+\subsection{Provoz a nasazení}
+
+Aplikace běží na portu 8080. Pro vývojové účely
+lze spustit lokálně příkazem
+\texttt{python3 app.py}. Produkční nasazení
+je možné prostřednictvím Docker kontejneru
+definovaného v \texttt{app/Dockerfile}.
+Skript \texttt{run.sh} automaticky ukončí
+předchozí instanci, nainstaluje závislosti
+a spustí aplikaci.
+
+Závislosti: flask, xgboost, joblib, pandas,
+numpy, scikit-learn. Frontendové knihovny
+(Leaflet, Turf.js, Plotly.js) jsou načítány
+z CDN.

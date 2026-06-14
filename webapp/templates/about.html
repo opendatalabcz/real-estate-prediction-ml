@@ -1,0 +1,90 @@
+{% extends "base.html" %} {% block title %}O projektu — Cena bytu{% endblock %}
+{% block content %}
+<div class="md3-about">
+  <div class="md3-about-card">
+    <h1>O projektu</h1>
+    <p class="md3-about-subtitle">Odhad a analýza cen nemovitostí</p>
+
+    <h2>Proč tento projekt vznikl?</h2>
+    <p>
+      Dostupnost bydlení je v posledních letech stále palčivějším tématem. Ceny
+      nemovitostí setrvale rostou a pro běžného člověka je dnes velmi obtížné
+      poznat, zda je požadovaná cena za dům či byt skutečně adekvátní.
+    </p>
+    <p>
+      Běžné realitní portály sice nabízejí základní filtry nebo ukazují průměrné
+      ceny za metr čtvereční, tyto agregované statistiky ale pro hlubší
+      pochopení nestačí. Cílem tohoto projektu je přinést do cenotvorby
+      nemovitostí větší transparentnost a pomoci lidem se rozhodovat.
+    </p>
+    <p>
+      Projekt vznikl jako bakalářská práce na
+      <a href="https://fit.cvut.cz/" target="_blank"
+        >Fakultě informačních technologií ČVUT</a
+      >
+      ve spolupráci s laboratoří
+      <a href="https://opendatalab.cz/" target="_blank">OpenDataLab</a>.
+    </p>
+
+    <h2>Hlavní cíl</h2>
+    <p>
+      Aplikace analyzuje vztah mezi nabízenou cenou a vlastnostmi nemovitosti
+      pomocí datové analytiky a modelů strojového učení. Výsledkem je nástroj,
+      který predikuje nabídkovou cenu a vysvětluje vliv jednotlivých
+      parametrů.
+    </p>
+
+    <h2>Jak projekt funguje?</h2>
+    <ul>
+      <li>
+        <strong>Sběr a příprava dat:</strong> Shromáždění a vyčištění reálných
+        nabídek nemovitostí.
+      </li>
+      <li><strong>Průzkum trhu:</strong> Analýza trendů a rozložení cen.</li>
+      <li>
+        <strong>Trénování modelů:</strong> Porovnání různých modelů,
+        nejpřesnější je XGBoost.
+      </li>
+      <li>
+        <strong>Interpretace:</strong> SHAP analýza vysvětluje, co cenu
+        ovlivňuje.
+      </li>
+    </ul>
+
+    <h2>Komu aplikace pomůže?</h2>
+    <ul>
+      <li>
+        <strong>Kupujícím:</strong> Vyhodnotit, zda nabídka není předražená.
+      </li>
+      <li><strong>Prodávajícím:</strong> Daty podložený odhad reálné ceny.</li>
+      <li>
+        <strong>Zájemcům o trh:</strong> Vhled do faktorů ovlivňujících ceny.
+      </li>
+    </ul>
+
+    <h2>Jak se počítá „Vliv faktorů na cenu“?</h2>
+
+    <p>Když aplikace zobrazí odhad ceny, ukáže také graf „Vliv faktorů na cenu“. Ten nevznikl pouhým seřazením parametrů podle důležitosti – každý modrý a červený pruh vychází z matematicky přesného rozdělení zásluh mezi všechny vstupní údaje, které do modelu vložíte.</p>
+
+    <h3>Proč to nestačí: průměry klamou</h3>
+    <p>Běžné realitní portály často ukazují jen průměrnou cenu za m² v dané lokalitě. Ta ale neřekne, o kolik levnější je byt v panelovém domě oproti cihlovému, nebo jak moc cenu ovlivní energetický štítek. Tyto vlivy se navíc navzájem ovlivňují – například výtah zvedne cenu jinak v Praze než na venkově. Jednoduché průměrování tyto souvislosti nedokáže zachytit.</p>
+
+    <h3>Jak to řeší SHAP: Spravedlivé rozdělení</h3>
+    <p>Používáme metodu <strong>SHAP</strong> (SHapley Additive exPlanations), která je převzata z teorie her. Představte si, že každý parametr (rozloha, lokalita, stav, …) je „hráč“ a výsledná cena je jejich společná „výhra“. SHAP spravedlivě spočítá, kolik každý hráč k výhře přispěl – a to tak, že bere v úvahu všechny možné kombinace parametrů. Díky tomu víte nejen <em>že</em> model cenu odhadl, ale také <em>proč</em> je výsledek právě takový.</p>
+
+    <h3>Co graf znamená v praxi</h3>
+    <ul>
+      <li><strong style="color:#2e7d32">Zelený pruh</strong> – daný parametr cenu oproti průměru zvyšuje (např. o +30 %).</li>
+      <li><strong style="color:#d32f2f">Červený pruh</strong> – daný parametr cenu oproti průměru snižuje (např. o −8 %).</li>
+      <li><strong>Průměr (základ)</strong> – průměrná cena napříč všemi byty v trénovacích datech.</li>
+      <li><strong>Odhadovaná cena</strong> – výsledný odhad = základ × multiplikátor₁ × multiplikátor₂ × … (součin všech vlivů).</li>
+      <li>Čím delší pruh, tím větší vliv daný parametr na výslednou cenu má. Pořadí parametrů odpovídá velikosti absolutního vlivu.</li>
+    </ul>
+
+    <h3>Jak model vznikl</h3>
+    <p>Model je natrénován na ~11 000 reálných nabídkách nemovitostí. Používáme algoritmus <strong>XGBoost</strong> (gradient boosted trees), který je považován za jeden z nejlepších pro práci s tabulkovými daty. Pro dosažení co nejvyšší přesnosti prošel model rozsáhlým laděním hyperparametrů a byl porovnán s několika alternativními přístupy (lineární regrese, rozhodovací stromy, hierarchické mediány). Pro zajištění spolehlivosti jsou výsledky vyhodnocovány na datech, která model při trénování neviděl.</p>
+
+    <a href="/" class="btn-primary" style="display: inline-flex; width: auto; margin-top: 24px">← Zpět na odhad</a>
+  </div>
+</div>
+{% endblock %}

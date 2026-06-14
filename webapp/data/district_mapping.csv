@@ -1,0 +1,88 @@
+district_id,name,locality_region_id,region_name
+1,České Budějovice,1,Jihočeský
+2,Český Krumlov,1,Jihočeský
+3,Jindřichův Hradec,1,Jihočeský
+4,Písek,1,Jihočeský
+5,Prachatice,1,Jihočeský
+6,Strakonice,1,Jihočeský
+7,Tábor,1,Jihočeský
+8,Domažlice,2,Plzeňský
+9,Cheb,3,Karlovarský
+10,Karlovy Vary,3,Karlovarský
+11,Klatovy,2,Plzeňský
+12,Plzeň-město,2,Plzeňský
+13,Plzeň-jih,2,Plzeňský
+14,Plzeň-sever,2,Plzeňský
+15,Rokycany,2,Plzeňský
+16,Sokolov,3,Karlovarský
+17,Tachov,2,Plzeňský
+18,Česká Lípa,5,Liberecký
+19,Děčín,4,Ústecký
+20,Chomutov,4,Ústecký
+21,Jablonec nad Nisou,5,Liberecký
+22,Liberec,5,Liberecký
+23,Litoměřice,4,Ústecký
+24,Louny,4,Ústecký
+25,Most,4,Ústecký
+26,Teplice,4,Ústecký
+27,Ústí nad Labem,4,Ústecký
+28,Hradec Králové,6,Královéhradecký
+29,Chrudim,7,Pardubický
+30,Jičín,6,Královéhradecký
+31,Náchod,6,Královéhradecký
+32,Pardubice,7,Pardubický
+33,Rychnov nad Kněžnou,6,Královéhradecký
+34,Semily,5,Liberecký
+35,Svitavy,7,Pardubický
+36,Trutnov,6,Královéhradecký
+37,Ústí nad Orlicí,7,Pardubický
+38,Zlín,9,Zlínský
+39,Kroměříž,9,Zlínský
+40,Prostějov,8,Olomoucký
+41,Uherské Hradiště,9,Zlínský
+42,Olomouc,8,Olomoucký
+43,Přerov,8,Olomoucký
+44,Šumperk,8,Olomoucký
+45,Vsetín,9,Zlínský
+46,Jeseník,8,Olomoucký
+47,Praha,10,Praha
+48,Benešov,11,Středočeský
+49,Beroun,11,Středočeský
+50,Kladno,11,Středočeský
+51,Kolín,11,Středočeský
+52,Kutná Hora,11,Středočeský
+53,Mladá Boleslav,11,Středočeský
+54,Mělník,11,Středočeský
+55,Nymburk,11,Středočeský
+56,Praha-východ,11,Středočeský
+57,Praha-západ,11,Středočeský
+58,Příbram,11,Středočeský
+59,Rakovník,11,Středočeský
+60,Bruntál,12,Moravskoslezský
+61,Frýdek-Místek,12,Moravskoslezský
+62,Karviná,12,Moravskoslezský
+63,Nový Jičín,12,Moravskoslezský
+64,Opava,12,Moravskoslezský
+65,Ostrava-město,12,Moravskoslezský
+66,Havlíčkův Brod,13,Vysočina
+67,Jihlava,13,Vysočina
+68,Pelhřimov,13,Vysočina
+69,Třebíč,13,Vysočina
+70,Žďár nad Sázavou,13,Vysočina
+71,Blansko,14,Jihomoravský
+72,Brno-město,14,Jihomoravský
+73,Brno-venkov,14,Jihomoravský
+74,Břeclav,14,Jihomoravský
+75,Hodonín,14,Jihomoravský
+76,Vyškov,14,Jihomoravský
+77,Znojmo,14,Jihomoravský
+5001,Praha 1,10,Praha
+5002,Praha 2,10,Praha
+5003,Praha 3,10,Praha
+5004,Praha 4,10,Praha
+5005,Praha 5,10,Praha
+5006,Praha 6,10,Praha
+5007,Praha 7,10,Praha
+5008,Praha 8,10,Praha
+5009,Praha 9,10,Praha
+5010,Praha 10,10,Praha

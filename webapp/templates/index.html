@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% block title %}Cena bytu — odhad ceny nemovitosti{% endblock %}
+{% block content %}
+<div class="shell">
+
+  <!-- Sidebar: Form -->
+  <aside class="side-sheet">
+    <form id="predict-form" autocomplete="off">
+
+      <!-- Lokalita -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-inner">
+          <div class="section-header">
+            <span class="eyebrow">📍 Lokalita</span>
+          </div>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="region">Kraj</label>
+              <select id="region" name="locality_region_id" required>
+                <option value="">Vyberte kraj</option>
+                {% for r in regions %}
+                <option value="{{ r.locality_region_id }}">{{ r.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="field full">
+              <label for="district">Okres</label>
+              <select id="district" name="district_id" required><option value="">Vyberte okres</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dispozice -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-inner">
+          <div class="section-header">
+            <span class="eyebrow">📐 Dispozice</span>
+          </div>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="category_sub">Dispozice</label>
+              <select id="category_sub" name="category_sub" required>
+                <option value="">Vyberte</option>
+                <option value="1">1+kk</option>
+                <option value="1+1">1+1</option>
+                <option value="2">2+kk</option>
+                <option value="2+1">2+1</option>
+                <option value="3">3+kk</option>
+                <option value="3+1">3+1</option>
+                <option value="4">4+kk</option>
+                <option value="4+1">4+1</option>
+                <option value="5+">5+</option>
+                <option value="atypicky">Atypický</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="usable_area_m2">Užitná plocha (m²)</label>
+              <input type="number" id="usable_area_m2" name="usable_area_m2" min="10" max="500" step="1" placeholder="65" required>
+            </div>
+            <div class="field">
+              <label for="total_area_m2">Celková plocha (m²)</label>
+              <input type="number" id="total_area_m2" name="total_area_m2" min="10" max="600" step="1" placeholder="75">
+            </div>
+            <div class="field">
+              <label for="floor_number">Podlaží</label>
+              <input type="number" id="floor_number" name="floor_number" min="1" max="50" step="1" placeholder="3">
+            </div>
+            <div class="field">
+              <label for="total_floors">Celkem pater</label>
+              <input type="number" id="total_floors" name="total_floors" min="1" max="50" step="1" placeholder="8">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stav budovy -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-inner">
+          <div class="section-header">
+            <span class="eyebrow">🏗️ Stav budovy</span>
+          </div>
+          <div class="form-grid">
+            <div class="field full">
+              <label for="construction_type">Konstrukce</label>
+              <select id="construction_type" name="construction_type">
+                <option value="">Vyberte</option>
+                <option value="Cihlová">Cihlová</option>
+                <option value="Panelová">Panelová</option>
+                <option value="Skeletová">Skeletová</option>
+                <option value="Smíšená">Smíšená</option>
+                <option value="Dřevostavba">Dřevostavba</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="building_condition">Stav</label>
+              <select id="building_condition" name="building_condition">
+                <option value="">Vyberte</option>
+                <option value="Projekt">Projekt</option>
+                <option value="Ve výstavbě">Ve výstavbě</option>
+                <option value="Novostavba">Novostavba</option>
+                <option value="Velmi dobrý">Velmi dobrý</option>
+                <option value="Dobrý">Dobrý</option>
+                <option value="Po rekonstrukci">Po rekonstrukci</option>
+                <option value="V rekonstrukci">V rekonstrukci</option>
+                <option value="Před rekonstrukcí">Před rekonstrukcí</option>
+                <option value="Špatný">Špatný</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="energy_class">En. třída</label>
+              <select id="energy_class" name="energy_class">
+                <option value="">Vyberte</option>
+                {% for c in "ABCDEFG" %}<option value="{{ c }}">{{ c }}</option>{% endfor %}
+              </select>
+            </div>
+            <div class="field">
+              <label for="construction_year">Rok výst.</label>
+              <input type="number" id="construction_year" name="construction_year" min="1800" max="2028" step="1" placeholder="2005">
+            </div>
+            <div class="field full">
+              <label for="ownership_type">Vlastnictví</label>
+              <select id="ownership_type" name="ownership_type">
+                <option value="">Vyberte</option>
+                <option value="Osobní">Osobní</option>
+                <option value="Družstevní">Družstevní</option>
+                <option value="Státní/obecní">Státní/obecní</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vybavení -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-inner">
+          <div class="section-header">
+            <span class="eyebrow">✅ Vybavení</span>
+          </div>
+          <div class="chips" id="amenities-chips">
+            <label class="toggle" data-field="has_elevator">Výtah</label>
+            <label class="toggle" data-field="has_terrace">Terasa</label>
+            <label class="toggle" data-field="has_garage">Garáž</label>
+            <label class="toggle" data-field="has_cellar" data-show="cellar_area_field">Sklep</label>
+            <label class="toggle" data-field="has_loggia" data-show="loggia_area_field">Lodžie</label>
+          </div>
+          <div class="form-grid" style="margin-top:12px">
+            <div class="field" id="loggia_area_field" style="display:none">
+              <label for="loggia_area_m2">Plocha lodžie (m²)</label>
+              <input type="number" id="loggia_area_m2" name="loggia_area_m2" min="0" step="1" value="0" placeholder="0">
+            </div>
+            <div class="field" id="cellar_area_field" style="display:none">
+              <label for="cellar_area_m2">Plocha sklepa (m²)</label>
+              <input type="number" id="cellar_area_m2" name="cellar_area_m2" min="0" step="1" value="0" placeholder="0">
+            </div>
+            <div class="field">
+              <label for="is_furnished">Zařízeno</label>
+              <select id="is_furnished" name="is_furnished">
+                <option value="false">Ne</option>
+                <option value="true">Ano</option>
+                <option value="částečně">Částečně</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="location_type">Poloha v obci</label>
+              <select id="location_type" name="location_type">
+                <option value="">Vyberte</option>
+                <option value="Centrum obce">Centrum obce</option>
+                <option value="Sídliště">Sídliště</option>
+                <option value="Okraj obce">Okraj obce</option>
+                <option value="Klidná část">Klidná část</option>
+                <option value="Luxusní">Luxusní</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary">🔮 Odhadnout cenu</button>
+    </form>
+  </aside>
+
+  <!-- Content: Map + results -->
+  <main class="content-stack">
+    <div class="card map-card">
+      <div class="card-inner" style="padding-bottom:0">
+        <div class="section-header">
+          <div>
+            <div class="eyebrow">🗺️ Výběr lokality</div>
+            <h2>Mapa</h2>
+          </div>
+          <div class="map-actions">
+            <span id="map-info" class="status-chip">Klikněte na mapu</span>
+          </div>
+        </div>
+      </div>
+      <div id="map"></div>
+      <div class="card-inner" style="padding-top:14px">
+        <div class="coord-grid">
+          <div class="field">
+            <label for="latitude">Zeměpisná šířka</label>
+            <input type="text" id="latitude2" placeholder="50.088">
+          </div>
+          <div class="field">
+            <label for="longitude">Zeměpisná délka</label>
+            <input type="text" id="longitude2" placeholder="14.4208">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="result" style="display:none">
+      <div class="card">
+        <div class="card-inner" style="text-align:center">
+          <div>
+            <div class="price-sub" style="margin-bottom:4px">Odhadovaná cena</div>
+            <div class="price-big" id="result-price">—</div>
+            <div class="confidence-range" id="result-confidence" style="margin-top:10px;font-size:16px;font-weight:500;color:var(--md-primary)"></div>
+            <div class="price-sub" id="result-per-m2" style="margin-top:10px">— Kč / m²</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SHAP -->
+    <div id="shap-section" class="md3-shap" style="display:none">
+      <div class="md3-shap-header" style="display:flex;align-items:center;gap:8px">
+        <span>🔍 Vliv faktorů na cenu</span>
+        <span id="shap-help-toggle" style="cursor:pointer;font-size:13px;color:var(--md-primary);font-weight:400;text-transform:none;letter-spacing:0;padding:2px 10px;border-radius:999px;border:1px solid var(--md-outline-variant);background:var(--md-surface);user-select:none">?</span>
+      </div>
+      <div id="shap-help" style="display:none;margin-bottom:12px;padding:10px 14px;border-radius:12px;background:var(--md-surface-container-low);font-size:12px;line-height:1.6;color:var(--md-on-surface-variant)">
+        <strong>Jak to funguje?</strong> Graf znázorňuje, o kolik procent každý parametr zvyšuje nebo snižuje cenu oproti průměru (
+        <span style="color:#2e7d32;font-weight:600">zelená</span> = cenu zvyšuje,
+        <span style="color:#d32f2f;font-weight:600">červená</span> = cenu snižuje).
+        Základ se postupně násobí jednotlivými vlivy – výsledný odhad je součin všech faktorů.
+        Model zohledňuje jak údaje o bytu (plocha, stav, vybavení), tak i polohové faktory (vzdálenost k MHD, obchodům, centru kraje, kvalita dopravního spojení, hustota občanské vybavenosti).
+        Metoda SHAP (SHapley Additive exPlanations) zajišťuje spravedlivé rozdělení zásluh mezi všechny parametry.
+        <a href="/about" style="color:var(--md-primary);text-decoration:underline;text-underline-offset:2px">Více →</a>
+      </div>
+      <div id="shap-chart"></div>
+    </div>
+
+    <!-- Error -->
+    <div id="error" style="display:none;margin-top:16px;padding:12px 14px;border-radius:18px;background:var(--md-error-container);color:var(--md-error);font-size:13px">
+      <div id="error-msg"></div>
+    </div>
+  </main>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>const DISTRICTS = {{ districts | tojson }}, REGIONS = {{ regions | tojson }};</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js"></script>
+<script src="/static/js/map.js"></script>
+<script src="/static/js/form.js"></script>
+{% endblock %}

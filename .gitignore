@@ -9,23 +9,14 @@ env/
 .env
 .venv
 
-# Jupyter Notebook
+# Jupyter Notebook checkpoints
 .ipynb_checkpoints
-
-# Data & Machine Learning Models
-# (Ignore downloaded data and saved model weights to avoid pushing large files to Git)
-data/
-*.csv
-*.json
-*.pkl
-*.h5
-*.model
 
 # IDE / OS
 .DS_Store
 .vscode/
 .idea/
-.*
+
 # Distribution / Packaging
 build/
 dist/

@@ -1,0 +1,5 @@
+feature_variant,n_features,mean_missing_fraction,max_missing_fraction,high_corr_pairs_abs_ge_0_90
+B_nearest_transport_only,1,0.0,0.0,0
+C_nearest_grocery_only,1,0.0,0.0,0
+D_city_center_only,1,0.0,0.0,0
+E_three_core_features,3,0.0,0.0,0

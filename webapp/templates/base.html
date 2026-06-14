@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Cena bytu — odhad ceny{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+    <link rel="stylesheet" href="/static/css/app.css" />
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body>
+    <header class="top-app-bar">
+      <div>
+        <div class="brand-kicker">Cena bytu</div>
+        <h1>
+          <a href="/" style="color: inherit; text-decoration: none"
+            >Odhad ceny nemovitosti</a
+          >
+        </h1>
+        <p>Predikce nabídkové ceny na základě vlastností bytu a lokalit</p>
+      </div>
+      <nav style="display: flex; align-items: center; gap: 12px">
+        <a href="/about">O projektu</a>
+      </nav>
+    </header>
+
+    {% block content %}{% endblock %}
+
+    <footer class="footer-note">
+      <p style="margin: 0 0 4px">
+        Tiep Dang,
+        <i>ODHADY NABÍDKOVÝCH CEN NEMOVITOSTÍ NA ZÁKLADĚ JEJICH VLASTNOSTÍ</i>
+        [online]. Bakalářská práce. Praha: ČVUT FIT &amp; OpenDataLab, 2026.
+      </p>
+      <p style="margin: 0 0 4px">
+        Kontakt: <a href="mailto:dangtiep@fit.cvut.cz">dangtiep@fit.cvut.cz</a>
+      </p>
+      <p style="margin: 0 0 10px; font-style: italic; opacity: 0.65">
+        Provozovatel neodpovídá za správnost a úplnost zpracovaných dat a
+        informací.
+      </p>
+      <div class="md3-footer-logos">
+        <a href="https://fit.cvut.cz/" target="_blank" rel="noreferrer"
+          ><img
+            alt="Logo FIT ČVUT"
+            height="48"
+            src="/static/logos/logo-fit.svg"
+        /></a>
+        <a href="https://opendatalab.cz/" target="_blank" rel="noreferrer"
+          ><img
+            alt="Logo OpenDataLab"
+            height="48"
+            src="/static/logos/logo-odl.svg"
+        /></a>
+      </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-3.0.1.min.js"></script>
+    {% block extra_scripts %}{% endblock %}
+  </body>
+</html>
