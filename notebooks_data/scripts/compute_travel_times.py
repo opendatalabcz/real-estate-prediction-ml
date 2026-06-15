@@ -23,13 +23,14 @@ DELAY_BETWEEN = 60.0 / REQUESTS_PER_MINUTE  # seconds between requests
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 APARTMENTS_CSV = DATA_DIR / "apartments_raw_data.csv"
+APARTMENTS_TEST_CSV = DATA_DIR / "apartments_raw_data_test.csv"
 CITY_CENTERS_CSV = DATA_DIR / "city_centers.csv"
 OUTPUT_CSV = DATA_DIR / "city_center_travel_times.csv"
 RESUME_CSV = DATA_DIR / "city_center_travel_times_progress.csv"
 
 
-def load_apartments():
-    with open(APARTMENTS_CSV, encoding="utf-8-sig") as f:
+def load_apartments(path=APARTMENTS_CSV):
+    with open(path, encoding="utf-8-sig") as f:
         return list(csv.DictReader(f))
 
 
@@ -68,13 +69,19 @@ FIELDNAMES = [
 
 
 def load_progress():
-    if not RESUME_CSV.exists():
-        return {}
     done = {}
-    with open(RESUME_CSV, encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            done[row["listing_id"]] = row
+    # First check resume file (partial progress)
+    if RESUME_CSV.exists():
+        with open(RESUME_CSV, encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                done[row["listing_id"]] = row
+    # Also check output CSV for already-computed train data
+    if OUTPUT_CSV.exists():
+        with open(OUTPUT_CSV, encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                done[row["listing_id"]] = row
     return done
 
 
@@ -86,19 +93,21 @@ def save_progress(done):
 
 
 def main():
-    apartments = load_apartments()
+    apartments = load_apartments(APARTMENTS_CSV)
+    apartments_test = load_apartments(APARTMENTS_TEST_CSV)
+    all_apartments = apartments + apartments_test
     city_centers = load_city_centers()
-    print(f"Loaded {len(apartments)} apartments, {len(city_centers)} city centers")
+    print(f"Loaded {len(apartments)} train + {len(apartments_test)} test = {len(all_apartments)} apartments, {len(city_centers)} city centers")
 
     done = load_progress()
     print(f"Resuming: {len(done)} already computed")
 
     results = dict(done)
 
-    if len(results) == len(apartments):
+    if len(results) == len(all_apartments):
         print("All listings already computed, writing final output.")
     else:
-        for i, apt in enumerate(apartments):
+        for i, apt in enumerate(all_apartments):
             listing_id = apt.get("id", str(i))
             if listing_id in results:
                 continue
@@ -136,7 +145,7 @@ def main():
 
             completed = len(results)
             if completed % 50 == 0:
-                print(f"  {completed}/{len(apartments)}")
+                print(f"  {completed}/{len(all_apartments)}")
                 save_progress(results)
 
             time.sleep(DELAY_BETWEEN)
@@ -146,7 +155,7 @@ def main():
     with open(OUTPUT_CSV, "w", encoding="utf-8", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=FIELDNAMES)
         writer.writeheader()
-        for apt in apartments:
+        for apt in all_apartments:
             listing_id = apt.get("id", "")
             if listing_id in results:
                 writer.writerow(results[listing_id])

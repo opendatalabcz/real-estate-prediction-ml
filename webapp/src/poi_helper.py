@@ -3,7 +3,7 @@ POI feature enhancement layer — top-5 forward-selected features only.
 
 Returns 5 POI features matching report.tex (tab:poi_correlation):
   - transport_quality_score      continuous: 10/(1+d_metro) + 1/(1+d_tram)
-  - city_center_travel_time_min  Haversine km to region city center
+  - city_center_travel_time_min  OSRM driving time (min), Haversine fallback
   - convenience_nearest_km        BallTree k=1 nearest convenience store
   - grocery_avg_3_nearest_km      BallTree k=3 avg distance to groceries
   - supermarket_nearest_km        BallTree k=1 nearest supermarket
@@ -13,6 +13,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import requests
 from sklearn.neighbors import BallTree
 
 EARTH_RADIUS_KM = 6371.0088
@@ -29,19 +30,6 @@ def _query_k(tree, lat, lng, k):
     return dist[0] * EARTH_RADIUS_KM, idx[0]
 
 
-def _query_radius(tree, lat, lng, radius_km):
-    pt = np.radians([[lat, lng]])
-    r = radius_km / EARTH_RADIUS_KM
-    count = tree.query_radius(pt, r=r, count_only=True)[0]
-    return int(count)
-
-
-def _query_radius_idx(tree, lat, lng, radius_km):
-    pt = np.radians([[lat, lng]])
-    r = radius_km / EARTH_RADIUS_KM
-    return tree.query_radius(pt, r=r)[0]
-
-
 def _haversine_km(lat1, lon1, lat2, lon2):
     lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
     dlat = lat2 - lat1
@@ -52,6 +40,9 @@ def _haversine_km(lat1, lon1, lat2, lon2):
 
 class PoiHelper:
     """Cached BallTree POI engine. Builds trees once, then compute() per coordinate."""
+
+    OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
+    OSRM_TIMEOUT = 3
 
     def __init__(self, transport_path, grocery_path, city_centers_path):
         self.transport = pd.read_csv(transport_path)
@@ -71,6 +62,21 @@ class PoiHelper:
         self._t_metro = _build_tree(metro) if len(metro) > 0 else None
         self._t_tram = _build_tree(tram) if len(tram) > 0 else None
 
+        self._osrm_session = requests.Session()
+
+    def _travel_time_min(self, lat, lng, clat, clon):
+        """OSRM driving time in minutes, Haversine fallback on failure."""
+        try:
+            url = f"{self.OSRM_URL}/{lng},{lat};{clon},{clat}?overview=false"
+            resp = self._osrm_session.get(url, timeout=self.OSRM_TIMEOUT)
+            if resp.status_code == 200:
+                data = resp.json()
+                if data.get("code") == "Ok":
+                    return data["routes"][0]["duration"] / 60.0
+        except Exception:
+            pass
+        return float(_haversine_km(lat, lng, clat, clon)) * 0.8
+
     # ------------------------------------------------------------------
     # Public API — returns dict of top-5 POI features
     # ------------------------------------------------------------------
@@ -78,7 +84,6 @@ class PoiHelper:
         f = {}
 
         # --- 1. transport_quality_score — continuous per report.tex ---
-        # Q = 10/(1+d_metro) + 1/(1+d_tram), bus weight=0
         score = 0.0
         if self._t_metro is not None:
             d, _ = _query_k(self._t_metro, lat, lng, 1)
@@ -88,12 +93,16 @@ class PoiHelper:
             score += 1.0 / (1.0 + float(d[0]))
         f["transport_quality_score"] = score
 
-        # --- 2. city_center_travel_time_min — Haversine km ---
+        # --- 2. city_center_travel_time_min — OSRM driving time (min) ---
         cc = self.city_centers[self.city_centers["locality_region_id"] == region_id]
-        f["city_center_travel_time_min"] = (
-            float(_haversine_km(lat, lng, cc.iloc[0]["center_latitude"], cc.iloc[0]["center_longitude"]))
-            if len(cc) > 0 else 0.0
-        )
+        if len(cc) > 0:
+            f["city_center_travel_time_min"] = self._travel_time_min(
+                lat, lng,
+                float(cc.iloc[0]["center_latitude"]),
+                float(cc.iloc[0]["center_longitude"]),
+            )
+        else:
+            f["city_center_travel_time_min"] = 0.0
 
         # --- 3. supermarket_nearest_km ---
         if self._t_supermarket is not None:

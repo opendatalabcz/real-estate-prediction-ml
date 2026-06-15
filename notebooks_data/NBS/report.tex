@@ -49,7 +49,7 @@ Teoretická část vytvoří potřebný rámec pro pochopení problematiky a slo
 %---------------------------------------------------------------
 Ceny nemovitostí jsou zásadně ovlivňovány vzájemným působením nabídky a poptávky, což potvrzuje i Česká národní banka, podle níž se ceny rezidenčních nemovitostí nacházejí ve vzestupné fázi cyklu a jejich růst odráží zvýšenou poptávku při relativně omezené nabídce. Tento vývoj ovlivňuje nejen dostupnost bydlení, ale také širší makroekonomické prostředí \cite{CNB2024RezidencniTrh,CNB2024RealitniTrh,CNB2024ZFS}. 
 
-Současné přístupy k oceňování bytů vycházejí z předpokladu, že tržní cena nemovitosti je výsledkem působení více vzájemně provázaných faktorů. Vedle samotných vlastností bytu hraje významnou roli také širší ekonomické prostředí, vztah nabídky a poptávky, náklady výstavby, regulatorní omezení, kvalita lokality, dostupnost služeb a dopravy, technický stav nemovitosti či energetická náročnost budovy. Praktické přístupy k oceňování proto musí zohledňovat jak strukturální charakteristiky bytu, tak i jeho lokační a tržní souvislosti \cite{IVSC2022,AppraisalInstitute2020}.
+Současné přístupy k oceňování bytů vycházejí z předpokladu, že tržní cena nemovitosti je výsledkem působení více vzájemně provázaných faktorů. Vedle samotných vlastností bytu hraje významnou roli také širší ekonomické prostředí, náklady výstavby, regulatorní omezení, kvalita lokality, dostupnost služeb a dopravy, technický stav nemovitosti či energetická náročnost budovy. Praktické přístupy k oceňování proto musí zohledňovat jak strukturální charakteristiky bytu, tak i jeho lokační a tržní souvislosti \cite{IVSC2022,AppraisalInstitute2020}.
 
 \section{Hlavní přístupy oceňování bytů}
 
@@ -64,7 +64,7 @@ S tímto přístupem úzce souvisí \textbf{metoda hedonické ceny}, kterou lze 
 Nákladová metoda vychází z nákladů, které by bylo nutné vynaložit na pořízení nebo reprodukci obdobné nemovitosti v současných podmínkách. Od takto stanovené hodnoty se následně odečítá opotřebení, funkční nedostatky a další formy znehodnocení. Tento přístup se uplatňuje zejména v případech, kdy není k dispozici dostatek srovnatelných tržních transakcí, a také u specifických objektů či novostaveb. V případě bytů však bývá jeho využití omezenější, neboť reprodukční náklady nedokážou plně zachytit vliv lokality a aktuální tržní rovnováhu mezi nabídkou a poptávkou \cite{IVSC2022,CNB2024RezidencniTrh}.
 
 \subsection*{Výnosový přístup}
-Výnosová metoda odvozuje hodnotu bytu od očekávaných příjmů, které může nemovitost generovat, typicky formou nájemného. Podstatou je převod budoucích výnosů na současnou hodnotu, přičemž se zohledňují provozní náklady, míra rizika a požadovaná výnosnost investora. Tato metoda nachází uplatnění především při investičním pohledu na nemovitost, tedy v situacích, kdy je byt pořizován za účelem generování pravidelného výnosu. U běžného vlastnického bydlení hraje sekundární roli, neboť kupující často zohledňují i jiné než čistě ekonomické faktory \cite{IVSC2022}.
+Výnosová metoda odvozuje hodnotu bytu od očekávaných příjmů, které může nemovitost generovat, typicky formou nájemného. Podstatou je převod budoucích výnosů na současnou hodnotu, přičemž se zohledňují provozní náklady, míra rizika a požadovaná výnosnost investora. Tato metoda nachází uplatnění především při investičním pohledu na nemovitost, tedy v situacích, kdy je byt pořizován za účelem generování pravidelného výnosu. U běžného vlastnického bydlení hraje sekundární roli, neboť kupující často zohledňují i jiné než čistě ekonomické faktory jako specifické potřeby rodiny, kvalita sousedských vztahů nebo estetický dojem z nemovitosti \cite{IVSC2022}.
 
 \subsection{Nabídková a realizovaná cena}
 \label{subsec:offer_vs_transaction}
@@ -74,7 +74,7 @@ V této práci je cílovou proměnnou nabídková cena, tedy cena uvedená v inz
 \subsection*{Syntéza a shrnutí přístupů}
 Z uvedeného přehledu vyplývá, že volba metodiky se odvíjí od povahy nemovitosti, účelu ocenění a dostupnosti informací. U bytů je za nejvhodnější a nejvíce vypovídající považován \textbf{porovnávací přístup}, neboť nejlépe odráží skutečné tržní chování a umožňuje nejvěrněji zachytit vliv lokality i specifických vlastností jednotky \cite{IVSC2022,CNB2024RealitniTrh}.
 
-V reálných podmínkách je však tržní cena ovlivněna velkým množstvím vzájemně provázaných faktorů, jejichž manuální vyhodnocování je u rozsáhlých datových souborů neefektivní. Právě komplexita těchto vztahů a potřeba přesnějšího zachycení hedonických atributů vytváří prostor pro využití metod strojového učení, které dokáží identifikovat i nelineární vazby mezi vlastnostmi nemovitosti a její tržní cenou.
+V reálných podmínkách je však tržní cena ovlivněna velkým množstvím vzájemně provázaných faktorů, jejichž manuální vyhodnocování je u rozsáhlých datových souborů neefektivní. Právě komplexita těchto vztahů a potřeba přesnějšího zachycení hedonických atributů vytváří prostor pro využití metod strojového učení, které dokáží identifikovat i komplexnější vazby mezi vlastnostmi nemovitosti a její tržní cenou.
 
 \chapter{Metody strojového učení pro odhad cen bytů}
 \label{chap:ml_theory}
@@ -113,13 +113,13 @@ Modely použité v této práci proto odhadují nabídkovou cenu, nikoli přímo
 \subsection{Statistické vlastnosti cen nemovitostí}
 \label{subsec:price_distribution}
 
-Ceny nemovitostí mají několik vlastností, které je nutné zohlednit při návrhu predikčního modelu. Především jde o výraznou heterogenitu: byty se liší velikostí, stavem, typem vlastnictví, vybavením i lokalitou, takže nelze očekávat jednoduchý jednotný vztah mezi vstupními proměnnými a cenou. Tato heterogenita je jedním z hlavních důvodů využití hedonických modelů, které chápou cenu jako výsledek kombinace dílčích charakteristik nemovitosti \cite{Lancaster1966,Rosen1974}.
+Ceny nemovitostí mají několik vlastností, které je nutné zohlednit při návrhu predikčního modelu. Především jde o výraznou heterogenitu: byty se liší velikostí, stavem, typem vlastnictví, vybavením i lokalitou, takže nelze očekávat jednoduchý jednotný vztah mezi vstupními proměnnými a cenou \cite{Lancaster1966,Rosen1974}.
 
 Rozdělení cen bývá v praxi výrazně pravostranně šikmé, většina nemovitostí se nachází ve středních cenových hladinách, zatímco menší počet velmi drahých jednotek vytváří dlouhý pravý ocas. Z tohoto důvodu se v hedonických aplikacích často pracuje s logaritmem ceny, který snižuje vliv extrémních hodnot a umožňuje interpretovat chyby i vztahy spíše relativně než absolutně \cite{GoodmanThibodeau2003,Miller2022HedonicGAM}.
 
 Další důležitou vlastností je heteroskedasticita, tedy proměnlivý rozptyl reziduí napříč segmenty trhu. U dražších, větších nebo atypických nemovitostí může být absolutní chyba přirozeně vyšší než u standardních bytů \cite{Fletcher2000Heteroscedasticity,Stevenson2004Heteroscedasticity}.
 
-Ceny nemovitostí jsou navíc prostorově závislé. Byty ve stejné nebo podobné lokalitě sdílejí řadu okolních charakteristik, například dostupnost dopravy, služeb, pracovních příležitostí nebo kvalitu prostředí. Literatura k hedonickému oceňování opakovaně upozorňuje, že zahrnutí prostorové struktury nebo rozdělení trhu na homogennější subtrhy může zlepšit predikční přesnost \cite{GoodmanThibodeau2003,Muto2023Spatiotemporal}.
+Ceny nemovitostí jsou navíc prostorově závislé. Byty ve stejné nebo podobné lokalitě sdílejí řadu prostorových charakteristik, například dostupnost dopravy, služeb, pracovních příležitostí nebo kvalitu prostředí. Literatura k hedonickému oceňování opakovaně upozorňuje, že zahrnutí prostorové struktury nebo rozdělení trhu na homogennější podmnožiny může zlepšit predikční přesnost \cite{GoodmanThibodeau2003,Muto2023Spatiotemporal}.
 
 Tyto vlastnosti ovlivňují volbu modelů i metrik. Pravostranná šikmost podporuje použití logaritmické transformace cílové proměnné, heteroskedasticita a rozdílné cenové hladiny motivují sledování relativních chyb a prostorová závislost zdůrazňuje význam lokalizačních proměnných. V praktické části jsou proto modely vyhodnocovány nejen pomocí absolutních chyb, ale také pomocí relativních metrik, zejména mediánové absolutní procentní chyby.
 
@@ -132,30 +132,26 @@ Cílovou proměnnou této práce je celková nabídková cena bytové jednotky u
 \end{equation}
 Úkolem modelu je pro nový byt s vektorem příznaků \(\mathbf{x}_*\) odhadnout hodnotu \(\hat{y}_*\), která bude co nejbližší jeho skutečné \(y_*\).
 
-V rámci hedonického přístupu je cena nemovitosti chápána jako výsledek kombinace jejích pozorovaných charakteristik a charakteristik okolí, přičemž pozorovaná nabídková cena slouží jako empiricky dostupná aproximace této hodnoty. Vlastnosti rozdělení cen, včetně pravostranné šikmosti a heteroskedasticity, jsou podrobně diskutovány v~sekci~\ref{subsec:price_distribution}. Z~těchto důvodů je v~práci použita logaritmická transformace cílové proměnné.
+Vlastnosti rozdělení cen, včetně pravostranné šikmosti a heteroskedasticity, jsou podrobně diskutovány v~sekci~\ref{subsec:price_distribution}. Z~těchto důvodů je v~práci použita logaritmická transformace cílové proměnné.
 
 \paragraph{Logaritmická transformace.}
 Z uvedených důvodů je v empirické literatuře běžné pracovat s logaritmem ceny namísto ceny samotné, protože tato transformace obvykle zmírňuje šikmost rozdělení a zároveň umožňuje přirozenější interpretaci změn v relativním, nikoli absolutním vyjádření \cite{GoodmanThibodeau2003,Miller2022HedonicGAM}. Transformovaná cílová proměnná je proto definována jako
 \begin{equation}
     z_i = \ln(y_i).
 \end{equation}
-Na této škále je v práci trénována většina uvažovaných modelů, konkrétně lineární regrese, ridge regrese, rozhodovací stromy a XGBoost. Výjimku představuje pouze globální medián, který pracuje přímo s původní cenou \(y_i\).
+Na této škále je v práci trénována sada modelů, konkrétně lineární regrese, ridge regrese, rozhodovací stromy a XGBoost. Výjimku představuje pouze globální medián, který pracuje přímo s původní cenou \(y_i\), kde by tento krok byl zbytečný.
 
 Převod predikce z logaritmické škály zpět do korun však není zcela přímočarý. Uvažujme obecný log-lineární model \(\ln(y_i) = f(\mathbf{x}_i) + \varepsilon_i\), kde \(f(\cdot)\) je libovolná regresní funkce a \(\varepsilon_i\) označuje reziduální složku. Střední hodnota ceny na původní škále je pak
 \begin{equation}
     \operatorname{E}[y_i \mid \mathbf{x}_i] = \exp\!\bigl(f(\mathbf{x}_i)\bigr) \cdot \operatorname{E}\!\bigl[\exp(\varepsilon_i)\bigr],
 \end{equation}
-přičemž nerovnost \(\operatorname{E}[\exp(\varepsilon)] \ge \exp(\operatorname{E}[\varepsilon]) = 1\) plyne přímo z~konvexity exponenciální funkce (Jensenova nerovnost \cite{Jensen1906}). Přirozeným bodovým odhadem je proto
-\begin{equation}
-    \hat{y}_* = \exp(\hat{z}_*) \cdot \widehat{\operatorname{E}}\!\bigl[\exp(\varepsilon)\bigr],
-\end{equation}
-kde \(\hat{z}_* = \widehat{f}(\mathbf{x}_*)\) je predikce modelu na logaritmické škále. Přirozeným neparametrickým kandidátem pro odhad \(\operatorname{E}[\exp(\varepsilon)]\) je Duanův smearing estimator \cite{Duan1983Smearing}.
+Přirozeným neparametrickým kandidátem pro odhad \(\operatorname{E}[\exp(\varepsilon)]\) je Duanův smearing estimator \cite{Duan1983Smearing}.
 
 Korekční koeficient \(\hat{s}\) je odhadnut z trénovacích reziduí podle vztahu
 \begin{equation}
-    \hat{s} = \frac{1}{n}\sum_{i=1}^{n}\exp(e_i), \qquad \text{kde } e_i = z_i - \hat{z}_i,
+    \hat{s} = \frac{1}{n} \sum_{i=1}^{n} \exp(e_i),
 \end{equation}
-kde \(\hat{z}_i\) představuje predikci modelu pro \(i\)-té pozorování. Finální bodová predikce ceny nového bytu na původní korunové škále je pak dána vztahem
+kde \(e_i = z_i - \hat{z}_i\) je reziduum \(i\)-tého pozorování na logaritmické škále a \(n\) je celkový počet pozorování. Finální bodová predikce ceny nového bytu na původní korunové škále je pak dána vztahem
 \begin{equation}
     \hat{y}_* = \exp(\hat{z}_*)\,\hat{s}.
 \end{equation}
@@ -237,7 +233,7 @@ Interpretace modelů slouží k porozumění tomu, jak model využívá vstupní
 U lineárních modelů je predikce tvořena váženým součtem vstupních příznaků.
 Koeficienty proto poskytují přímou informaci o směru a velikosti asociace mezi daným příznakem a cílovou proměnnou, pokud jsou ostatní proměnné drženy konstantní. Tato interpretace je dobře použitelná u jednoduchých a málo transformovaných modelů.
 
-Prakticky je však třeba opatrnosti. Koeficienty mohou být ovlivněny škálováním, one-hot kódováním, regularizací i korelacemi mezi vstupními proměnnými. U ridge regrese navíc regularizace záměrně zmenšuje koeficienty, takže jejich absolutní velikost nelze chápat jako čistý ekonomický efekt
+V praxi je však třeba opatrnosti. Koeficienty mohou být ovlivněny škálováním, one-hot kódováním, regularizací i korelacemi mezi vstupními proměnnými. U ridge regrese navíc regularizace záměrně zmenšuje koeficienty, takže jejich absolutní velikost nelze chápat jako čistý ekonomický efekt
 daného atributu.
 
 \subsection{Význam příznaků u stromových modelů}
@@ -888,8 +884,8 @@ XGBoost + top-5 POI & 12 & 0{,}7 & 800 & 0{,}0867 & 0{,}9000 \\
 V rámci snahy o maximalizaci predikčního výkonu byla navržena a implementována sada 5 rozšiřujících POI parametrů pro predikci cen bytů v České republice. Výsledky na nezávislé testovací sadě ukazují následující zjištění (viz tab.~\ref{tab:model_performance}):
 
 \begin{enumerate}
-    \item Nejlepšího výkonu dosáhl doladěný POI model, který dosahuje \texttt{MedAPE = 0.0837} a potvrzuje tak mírné, avšak konzistentní zlepšení predikční přesnosti.
-    \item Oproti baseline modelu doladěný POI model snížil chybu MedAPE z 0.0855 na 0.0837, což představuje relativní zlepšení o přibližně $2{,}1\,\%$. 
+    \item Nejlepšího výkonu dosáhl doladěný POI model, který dosahuje \texttt{MedAPE = 0.0817} a potvrzuje tak mírné, avšak konzistentní zlepšení predikční přesnosti.
+    \item Oproti baseline modelu doladěný POI model snížil chybu MedAPE z 0.0855 na 0.0817, což představuje relativní zlepšení o přibližně $4{,}4\,\%$. 
     \item Výsledky prokazují, že prostorové POI příznaky (např. kvalita dopravní obslužnosti či vzdálenost k občanské vybavenosti) nesou dodatečnou informační hodnotu nad rámec základních geografických identifikátorů, byť jejich absolutní přínos k redukci chyby je v kontextu již tak silného stromového modelu spíše inkrementální.
 \end{enumerate}
 
@@ -904,12 +900,12 @@ V~5-fold OOF cross-validaci dosáhl baseline XGBoost MedAPE~=~0{,}0942, zatímco
 Model & MedAPE & MAPE & wMAPE & MAE [Kč] & $R^2$ \\
 \hline
 XGBoost tuned (no POI) & 0.0855 & 0.1327 & 0.1199 & 926\,916 & 0.9151 \\
-top-5 POI tuned & 0.0837 & 0.1239 & 0.1148 & 887\,235 & 0.9176 \\
+top-5 POI tuned & 0.0817 & 0.1262 & 0.1175 & 908\,512 & 0.9157 \\
 \hline
 \end{tabular}
 \end{table}
 
-Skutečnost, že chybová metrika na testovací sadě (MedAPE = $0{,}0855$ pro~baseline) vyšla nepatrně příznivěji než odhad z~křížové validace na trénovací množině (MedAPE = $0{,}0942$), nepředstavuje metodologickou chybu, nýbrž přirozený důsledek rozptylu při náhodném rozdělení dat (tzv.~\textit{hold-out variance}). Testovací vzorek mohl náhodně obsáhnout o~něco vyšší podíl standardních, snadněji predikovatelných bytových jednotek bez extrémních cenových anomálií. Z~akademického hlediska je klíčové zjištění, že nedošlo k~degradaci predikčního výkonu, což spolehlivě vyvrací podezření na přeučení (overfitting) modelu. Wilcoxonův párový test navíc potvrdil, že pozorované snížení mediánové absolutní procentuální chyby je statisticky signifikantní ($p = 0{,}0012$). Bootstrapový 95\,\% interval spolehlivosti pro rozdíl MedAPE ($[0{,}0002,\;0{,}0058]$) leží celý v~kladných hodnotách, což dokládá robustnost zlepšení.
+Skutečnost, že chybová metrika na testovací sadě (MedAPE = $0{,}0855$ pro~baseline) vyšla nepatrně příznivěji než odhad z~křížové validace na trénovací množině (MedAPE = $0{,}0942$), nepředstavuje metodologickou chybu, nýbrž přirozený důsledek rozptylu při náhodném rozdělení dat (tzv.~\textit{hold-out variance}). Testovací vzorek mohl náhodně obsáhnout o~něco vyšší podíl standardních, snadněji predikovatelných bytových jednotek bez extrémních cenových anomálií. Z~akademického hlediska je klíčové zjištění, že nedošlo k~degradaci predikčního výkonu, což spolehlivě vyvrací podezření na přeučení (overfitting) modelu. Wilcoxonův párový test navíc potvrdil, že pozorované snížení mediánové absolutní procentuální chyby je statisticky signifikantní ($p = 0{,}0069$). Bootstrapový 95\,\% interval spolehlivosti pro rozdíl MedAPE ($[-0{,}0005,\;0{,}0052]$) potvrzuje trend ke~zlepšení, ačkoliv jeho dolní mez mírně zasahuje do~záporných hodnot.
 
 Budoucí práce by se mohla zaměřit na rozšíření POI dat o další kategorie 
 (restaurace, školy, parky, zdravotnická zařízení) s využitím 
@@ -1050,7 +1046,7 @@ Aplikace je rozdělena na backend (serverová logika) a frontend (klient v prohl
 Systém je členěn do čtyř logických vrstev:
 \begin{itemize}
     \item \textbf{Prezentační vrstva (frontend)} -- jednostránková webová aplikace v HTML5, CSS3 a JavaScriptu, využívající knihovny Leaflet.js \cite{LeafletJS} pro interaktivní mapu, Turf.js \cite{TurfJS} pro geografické výpočty a Plotly.js \cite{PlotlyJS} pro vizualizaci výsledků.
-    \item \textbf{Aplikační vrstva (backend)} -- implementována v Pythonu pomocí mikrorámce Flask~3.0 \cite{Flask}, který přijímá požadavky, validuje vstupy, volá doménovou logiku a vrací strukturovanou JSON odpověď. V produkčním režimu je provozována nad WSGI serverem Gunicorn \cite{Gunicorn}.
+    \item \textbf{Aplikační vrstva (backend)} -- implementována v Pythonu pomocí mikrorámce Flask~3.0 \cite{Flask}, který přijímá požadavky, validuje vstupy, volá doménovou logiku a vrací strukturovanou JSON odpověď.
     \item \textbf{Doménová vrstva} -- obsahuje výpočetní jádro aplikace: natrénovaný model XGBoost, výpočet POI příznaků (PoiHelper), preprocessingovou pipeline a extrakci SHAP hodnot. Je oddělena od aplikační logiky pro nezávislé testování a aktualizaci.
     \item \textbf{Infrastrukturní vrstva} -- zajišťuje běh aplikace v produkčním prostředí pomocí kontejnerizace (Docker \cite{Docker}), správy závislostí a proměnných prostředí.
 \end{itemize}
@@ -1058,16 +1054,16 @@ Systém je členěn do čtyř logických vrstev:
 \subsection{Životní cyklus požadavku a API kontrakt}
 Komunikace mezi klientskou a serverovou částí probíhá bezstavově pomocí protokolu HTTP/HTTPS přes rozhraní REST API. Životní cyklus jednoho predikčního cyklu na pozadí probíhá v následujících fázích:
 \begin{enumerate}
-    \item \textbf{Příjem a serverová validace:} Server přijme strukturovaný JSON payload na endpointu \texttt{/predict}. Modul \texttt{app.py} implementuje striktní defenzivní logiku, která vynucuje přítomnost přesně 23~požadovaných příznaků a provádí explicitní typovou konverzi (přetypování na \texttt{float}/\texttt{int} a sanitaci řetězců), čímž eliminuje riziko neočekávaného selhání doménového jádra či pokusů o injektáž kódu. Pokud libovolný parametr chybí nebo nevyhovuje datovému typu, exekuce se přeruší a API vrátí kód \texttt{400 Bad Request} s výčtem chybějících polí.
-    \item \textbf{Obohacení dat (Runtime POI):} Na základě zadaných GPS souřadnic provede server prostorový dotaz (Spatial Join) nad interní, v~paměti lokalizovanou infrastrukturou prostorových indexů (připravenou třídou \texttt{PredictLoader}), což zajišťuje konstantní sub-milisekundovou latenci bez závislosti na externích síťových službách v~reálném čase.
-    \item \textbf{Inference a transformace:} Vektor příznaků je předložen předzpracování a Model provede predikci na logaritmické škále, která je následně transformována zpět do původní měnové škály.
+    \item \textbf{Příjem a serverová validace:} Server přijme strukturovaný JSON payload na endpointu \texttt{/predict}. Aplikace implementuje striktní defenzivní logiku, která vynucuje přítomnost přesně 23~požadovaných příznaků a provádí explicitní typovou konverzi (přetypování na \texttt{float}/\texttt{int} a sanitaci řetězců), čímž eliminuje riziko neočekávaného selhání doménového jádra. Pokud libovolný parametr chybí, požadavek je odmítnut s~kódem \texttt{400 Bad Request} s~výčtem chybějících polí. Dále je ověřeno, že GPS souřadnice spadají do~území České republiky.
+    \item \textbf{Obohacení dat (Runtime POI):} Na základě zadaných GPS souřadnic server vypočte pět prostorových příznaků: BallTree dotazy pro vzdálenosti k~zastávkám MHD a~obchodům, OSRM API \cite{OSRM} pro výpočet jízdní doby do~centra krajského města (s~Haversine fallbackem při výpadku) a~spojitý výpočet skóre kvality dopravy.
+    \item \textbf{Inference a transformace:} Vektor příznaků projde preprocessingovou pipeline (imputace, kódování, target encoding) a~XGBoost model vrátí predikci na logaritmické škále. Ta je převedena zpět na korunovou škálu pomocí Duanova smearing estimatoru \cite{Duan1983Smearing}.
     \item \textbf{Kalibrace a výpočet SHAP:} Na transformovaný bodový odhad je aplikován post-predikční kalibrační pipeline. Paralelně s tím jsou extrahovány lokální aditivní příspěvky (SHAP) a konformní meze spolehlivosti.
     \item \textbf{Odeslání odpovědi:} Server zkompiluje odpověď obsahující finální kalibrovanou cenu, intervaly a pole strukturovaných SHAP hodnot.
 \end{enumerate}
 
 
-\subsection{Inicializace a návrhový vzor Singleton}
-Z důvodu minimalizace latence je klíčové, aby model a doprovodné datové struktury nebyly načítány dynamicky při každém HTTP požadavku. Inicializace probíhá pomocí návrhového vzoru \textit{Singleton} zapouzdřeného ve třídě \texttt{PredictLoader}, která při startu aplikace načte serializovaný model (\texttt{tuned\_xgb\_pipeline.joblib}), parametry čištění dat, inicializuje prostorové indexy BallTree pro výpočet POI a připraví XGBoost booster pro extrakci SHAP hodnot. Instance je následně sdílena mezi všemi požadavky.
+\subsection{Inicializace}
+Z důvodu minimalizace latence je klíčové, aby model a doprovodné datové struktury nebyly načítány dynamicky při každém HTTP požadavku. Třída \texttt{PredictLoader} je instancována jednou při startu aplikace na~úrovni modulu; načte serializovaný XGBoost model, parametry čištění dat, inicializuje prostorové indexy BallTree pro výpočet POI a~připraví XGBoost booster pro extrakci SHAP hodnot. Instance je následně sdílena mezi všemi požadavky.
 
 \subsection{Kontejnerizace a nasazení}
 Pro reprodukovatelnost a snadné nasazení je backend zabalen do Docker kontejneru. \texttt{Dockerfile} definuje základní image (\texttt{python:3.12-slim}), instalaci závislostí z \texttt{requirements.txt}, kopírování zdrojových kódů a modelových souborů a spouštěcí příkaz. Pro orchestraci služeb je použit \texttt{docker-compose.yml}, který definuje mapování portů, připojení datových svazků (modely, CSV soubory) jako read-only a proměnné prostředí. Modelové soubory jsou do kontejneru připojeny jako externí volume, což umožňuje aktualizaci modelu bez přestavby celého image.
@@ -1128,7 +1124,7 @@ Kapitola popsala architekturu webové aplikace od backendu (vrstvená architektu
 
 Cílem této bakalářské práce bylo navrhnout a ověřit postup pro odhad nabídkových cen bytů v České republice na základě strukturovaných dat z realitních inzerátů a prostorových informací. Práce zahrnovala celý analytický proces od automatizovaného sběru dat, přes explorační analýzu, až po návrh, trénování a vyhodnocení robustních predikčních modelů nasazených ve webové aplikaci.
 
-Porovnání modelů prokázalo, že zatímco lineární přístupy poskytují solidní interpretovatelný základ, pokročilé metody strojového učení (XGBoost) lépe zachycují nelineární vztahy a interakce. Prokazatelným přínosem práce je integrace prostorové infrastruktury (POI). Obohacení modelu o metriky jako je kvalita dopravní obslužnosti či vzdálenost k občanské vybavenosti snížilo mediánovou chybu odhadu (MedAPE) o přibližně $2{,}1\,\%$ oproti baseline modelu. Ačkoliv se jedná o inkrementální zlepšení, potvrzuje to, že lokální dostupnost služeb hraje v cenotvorbě měřitelnou roli.
+Porovnání modelů prokázalo, že zatímco lineární přístupy poskytují solidní interpretovatelný základ, pokročilé metody strojového učení (XGBoost) lépe zachycují nelineární vztahy a interakce. Prokazatelným přínosem práce je integrace prostorové infrastruktury (POI). Obohacení modelu o metriky jako je kvalita dopravní obslužnosti či vzdálenost k občanské vybavenosti snížilo mediánovou chybu odhadu (MedAPE) o přibližně $4{,}4\,\%$ oproti baseline modelu. Ačkoliv se jedná o inkrementální zlepšení, potvrzuje to, že lokální dostupnost služeb hraje v cenotvorbě měřitelnou roli.
 
 Využití SHAP hodnot nad referenčním modelem navíc poskytlo transparentní vhled do logiky odhadů, kde dominantní roli hraje kombinace makro-lokality (okres) a plošných dispozic, sekundovaná stavem budovy a doplňkovým vybavením. 
 
