@@ -53,6 +53,11 @@ def predict():
     if missing:
         return jsonify({"error": f"Missing fields: {missing}"}), 400
 
+    lat = float(data["latitude"])
+    lng = float(data["longitude"])
+    if not (48.5 <= lat <= 51.1) or not (12.0 <= lng <= 18.9):
+        return jsonify({"error": "Souřadnice jsou mimo území České republiky"}), 400
+
     input_dict = {
         "category_sub": str(data["category_sub"]),
         "price_total": 0,
@@ -64,14 +69,14 @@ def predict():
         "total_area_m2": float(data["total_area_m2"]),
         "loggia_area_m2": float(data["loggia_area_m2"]),
         "cellar_area_m2": float(data["cellar_area_m2"]),
-        "floor_number": float(data["floor_number"]) if data["floor_number"] else None,
-        "total_floors": float(data["total_floors"]) if data["total_floors"] else None,
+        "floor_number": float(data["floor_number"]) if data["floor_number"] is not None else None,
+        "total_floors": float(data["total_floors"]) if data["total_floors"] is not None else None,
         "construction_type": str(data["construction_type"]),
         "building_condition": str(data["building_condition"]),
         "ownership_type": str(data["ownership_type"]),
         "location_type": str(data["location_type"]),
-        "construction_year": float(data["construction_year"]) if data["construction_year"] else None,
-        "energy_class": str(data["energy_class"]),
+        "construction_year": float(data["construction_year"]) if data["construction_year"] is not None else None,
+        "energy_class": str(data["energy_class"]) if data["energy_class"] else "missing",
         "has_elevator": bool(data["has_elevator"]),
         "has_garage": bool(data["has_garage"]),
         "has_cellar": bool(data["has_cellar"]),

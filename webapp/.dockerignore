@@ -6,3 +6,6 @@ __pycache__
 .vscode
 __pycache__
 *.joblib.bak
+data/
+models/
+*.geojson
