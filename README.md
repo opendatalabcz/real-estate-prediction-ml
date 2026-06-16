@@ -2,7 +2,11 @@
 
 Prediction of apartment offer prices in the Czech Republic using machine learning.
 
-Developed with support from **FIT ČVUT** (Faculty of Information Technology, Czech Technical University in Prague).
+## Afiliace
+
+Tento software vznikl za podpory Fakulty informačních technologií ČVUT v Praze.
+
+Více informací naleznete na [fit.cvut.cz](https://fit.cvut.cz).
 
 ## Project Structure
 
