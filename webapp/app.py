@@ -2,13 +2,13 @@ import json
 import os
 from pathlib import Path
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, send_file
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from src.predict_loader import PredictLoader
-from config import DISTRICT_MAPPING_PATH, REGION_MAPPING_PATH
+from config import DISTRICT_MAPPING_PATH, REGION_MAPPING_PATH, BOUNDARIES_OPT_GZ_PATH
 
 app = Flask(__name__)
 
@@ -110,6 +110,18 @@ def about():
 @app.route("/api/regions")
 def api_regions():
     return jsonify(regions_df.to_dict(orient="records"))
+
+
+@app.route("/api/boundaries")
+def api_boundaries():
+    response = send_file(
+        BOUNDARIES_OPT_GZ_PATH,
+        mimetype="application/geo+json",
+        as_attachment=False,
+        download_name="boundaries.geojson",
+    )
+    response.headers["Content-Encoding"] = "gzip"
+    return response
 
 
 if __name__ == "__main__":

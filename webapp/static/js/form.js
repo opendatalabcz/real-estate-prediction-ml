@@ -229,8 +229,24 @@ document.getElementById('predict-form').addEventListener('submit', async functio
   }
 });
 
+const PLOTLY_CDN = 'https://cdn.plot.ly/plotly-3.0.1.min.js';
+let plotlyReady = null;
+
+function loadPlotly() {
+    if (plotlyReady) return plotlyReady;
+    plotlyReady = new Promise((resolve, reject) => {
+        if (window.Plotly) return resolve();
+        const s = document.createElement('script');
+        s.src = PLOTLY_CDN;
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error('Plotly CDN failed'));
+        document.head.appendChild(s);
+    });
+    return plotlyReady;
+}
+
 // SHAP waterfall: multiplicative compounding in CZK
-function renderShap(shapValues, baseCzk, finalCzk) {
+async function renderShap(shapValues, baseCzk, finalCzk) {
   const container = document.getElementById('shap-chart');
   container.innerHTML = '';
 
@@ -255,6 +271,7 @@ function renderShap(shapValues, baseCzk, finalCzk) {
   // No final total bar — line + annotation below mark the prediction
 
   try {
+    await loadPlotly();
     Plotly.newPlot(container, [{
       type: 'waterfall',
       y: labels,

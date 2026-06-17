@@ -83,7 +83,7 @@ map.on('click', function(e) {
 let districtCenters = {};
 let regionCenters = {};
 
-fetch('/static/data/okresy_boundaries_simplified.geojson')
+fetch('/api/boundaries')
   .then(r => r.json())
   .then(function(data) {
     boundaryFeatures = data.features;
