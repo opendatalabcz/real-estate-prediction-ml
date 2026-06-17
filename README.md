@@ -2,11 +2,11 @@
 
 Prediction of apartment offer prices in the Czech Republic using machine learning.
 
-## Afiliace
+<img src="https://fit.cvut.cz/static/images/fit-cvut-logo-en.svg" alt="FIT CTU logo" height="200">
 
-Tento software vznikl za podpory Fakulty informačních technologií ČVUT v Praze.
+This software was developed with the support of the **Faculty of Information Technology, Czech Technical University in Prague**.
 
-Více informací naleznete na [fit.cvut.cz](https://fit.cvut.cz).
+For more information, visit [fit.cvut.cz](https://fit.cvut.cz).
 
 ## Project Structure
 
