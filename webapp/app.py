@@ -55,7 +55,7 @@ def predict():
 
     lat = float(data["latitude"])
     lng = float(data["longitude"])
-    if not (48.5 <= lat <= 51.1) or not (12.0 <= lng <= 18.9):
+    if not (48.0 <= lat <= 51.5) or not (12.0 <= lng <= 19.0):
         return jsonify({"error": "Souřadnice jsou mimo území České republiky"}), 400
 
     input_dict = {

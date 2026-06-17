@@ -45,6 +45,7 @@ class PredictLoader:
         )
 
         self.conformal_q = 0.1257
+        self.smearing_factor = float(np.load(PROJECT_ROOT / "models" / "smearing_factor.npy")[0])
         self._init_calibration()
 
     def _apply_removal_policy(self, df):
@@ -92,6 +93,7 @@ class PredictLoader:
         X = processed.drop(columns=["price_total", "__row_id"], errors="ignore")
 
         price = float(self.model.predict(X)[0])
+        price = price * self.smearing_factor
 
         area = float(input_dict.get("usable_area_m2", 1))
 

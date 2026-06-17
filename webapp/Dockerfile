@@ -13,4 +13,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["python3", "-c", "from app import app; app.run(host='0.0.0.0', port=8080, debug=False)"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "app:app"]
