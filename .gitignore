@@ -21,3 +21,11 @@ env/
 build/
 dist/
 *.egg-info/
+
+# Jupyter / IPython history
+.history/
+
+# LaTeX build artifacts
+notebooks_data/NBS/images/
+notebooks_data/NBS/report.log
+notebooks_data/NBS/report.txt

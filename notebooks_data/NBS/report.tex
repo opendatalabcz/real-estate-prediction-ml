@@ -6,18 +6,19 @@
 
 Realitní trh je v dnešní ekonomice stále předmětem zájmu mnoha z nás. Pro většinu domácností představuje koupě nemovitosti jedno z nejvýznamnějších finančních rozhodnutí, zatímco pro investory a bankovní sektor jsou nemovitosti klíčovými aktivy, která vyžadují přesné ocenění. Cena nemovitosti však není jasně daná statická veličina. Je výsledkem interakce řady faktorů, od makroekonomických ukazatelů až po specifické atributy jednotlivé nemovitosti, jako je lokalita, technický stav nebo energetická náročnost.
 
+
 %---------------------------------------------------------------
 %---------------------------------------------------------------
 
-Tradiční metody oceňování často spoléhají na netransparentní znalecké posudky nebo na komparativní metody, které mohou být nepřesné kvůli nedostatku dat (viz kapitola \ref{chap:ml_theory}). S rostoucí dostupností dat a výpočetního výkonu se objevuje příležitost využít pokročilé statistické metody a modelování. Použití těchto přístupů nejen umožňuje automatizaci procesu, ale především poskytuje transparentnost v tom, jak je cena určena na základě kvantifikovatelných parametrů.
+Tradiční metody oceňování často spoléhají na netransparentní znalecké posudky nebo na komparativní metody, které mohou být nepřesné kvůli nedostatku dat (viz kapitola~\ref{chap:market_analysis}). Větší dostupnost dat a výpočetního výkonu umožňuje použít statistické metody, které proces oceňování automatizují a zároveň ukazují, jak jednotlivé parametry cenu ovlivňují.
 
 %---------------------------------------------------------------
 \section{Cíle práce}
 %---------------------------------------------------------------
 
-Hlavním cílem této práce je navrhnout, implementovat a ověřit model pro odhad tržní nabídkové ceny bytů v České republice na základě jejich specifických atributů. Mezi tyto atributy mohou patřit strukturální charakteristiky nemovitosti (např. užitná plocha, počet místností, stav budovy a energetická náročnost), stejně jako lokální proměnné zahrnující geografické souřadnice, regionální faktory a dostupnost služeb, jako jsou obchody nebo veřejná doprava. 
+Hlavním cílem této práce je navrhnout, implementovat a ověřit model pro odhad tržní nabídkové ceny bytů v České republice na základě jejich specifických atributů. Mezi tyto atributy mohou patřit strukturální charakteristiky nemovitosti (např. užitná plocha, počet místností, stav budovy a energetická náročnost), stejně jako lokalizační proměnné zahrnující geografické souřadnice, regionální faktory a dostupnost služeb, jako jsou obchody nebo veřejná doprava. 
 
-Důraz je kladen na identifikaci klíčových faktorů, které významně ovlivňují nabídkovou cenu bytů, a na vyhodnocení prediktivní přesnosti navrženého modelu. Pro zachování přehlednosti a logické struktury jsou cíle práce rozděleny na teoretickou a praktickou část. Teoretická část je zaměřena na vymezení problematiky, analýzu realitního trhu a představení vybraných metod strojového učení (viz kapitoly~\ref{chap:market_analysis} a~\ref{chap:ml_theory}), zatímco praktická část se věnuje sběru a předzpracování dat, návrhu modelů, jejich evaluaci a interpretaci výsledků (viz kapitoly~\ref{sec:data} a~\ref{chap:implementation}).
+Důraz je kladen na identifikaci hlavních faktorů, které ovlivňují nabídkovou cenu bytů, a na vyhodnocení prediktivní přesnosti navrženého modelu. Pro zachování přehlednosti a logické struktury jsou cíle práce rozděleny na teoretickou a praktickou část. Teoretická část je zaměřena na vymezení problematiky, analýzu realitního trhu a představení vybraných metod strojového učení (viz kapitola~\ref{chap:market_analysis}), zatímco praktická část se věnuje sběru a předzpracování dat, návrhu modelů, jejich evaluaci a interpretaci výsledků (viz kapitoly~\ref{sec:data} a~\ref{chap:implementation}).
 
 \section{Teoretické cíle}
 
@@ -25,7 +26,7 @@ Teoretická část vytvoří potřebný rámec pro pochopení problematiky a slo
 
 \begin{itemize}
     \item \textbf{Analýza tržního prostředí:} Definovat základní pojmy trhu s nemovitostmi a popsat faktory ovlivňující nabídku a poptávku po bydlení.
-    \item \textbf{Současné metody naceňování:} Kriticky zhodnotit současné přístupy k oceňování se zaměřením na komparativní metodu a statistické přístupy.
+    \item \textbf{Současné metody oceňování:} Kriticky zhodnotit současné přístupy k oceňování se zaměřením na komparativní metodu a statistické přístupy.
     \item \textbf{Přehled algoritmů:} Představit vybrané regresní metody a algoritmy strojového učení vhodné pro predikci spojitých proměnných.
 \end{itemize}
 
@@ -45,46 +46,47 @@ Teoretická část vytvoří potřebný rámec pro pochopení problematiky a slo
  \item \textbf{Prezentace výsledků}: Implementovat uživatelsky přívětivé rozhraní pro prezentaci výsledků modelu, které umožní zobrazit odhad nabídkové ceny vlastního bytu a interpretovat vliv jednotlivých vstupních proměnných na výslednou predikci.
 \end{itemize}
 
-\chapter{Analýza trhu s byty a současné metody oceňování} \label{chap:market_analysis}
+\chapter{Teorie současného oceňování a strojového učení} \label{chap:market_analysis}
 %---------------------------------------------------------------
-Ceny nemovitostí jsou zásadně ovlivňovány vzájemným působením nabídky a poptávky, což potvrzuje i Česká národní banka, podle níž se ceny rezidenčních nemovitostí nacházejí ve vzestupné fázi cyklu a jejich růst odráží zvýšenou poptávku při relativně omezené nabídce. Tento vývoj ovlivňuje nejen dostupnost bydlení, ale také širší makroekonomické prostředí \cite{CNB2024RezidencniTrh,CNB2024RealitniTrh,CNB2024ZFS}. 
+Ceny nemovitostí jsou zásadně ovlivňovány vzájemným působením nabídky a poptávky, což tvrdí i Česká národní banka, podle níž se ceny rezidenčních nemovitostí nacházejí ve vzestupné fázi cyklu a jejich růst odráží zvýšenou poptávku při relativně omezené nabídce. Tento vývoj ovlivňuje nejen dostupnost bydlení, ale také širší makroekonomické prostředí~\cite{CNB2024RezidencniTrh,CNB2024RealitniTrh,CNB2024ZFS}. 
 
-Současné přístupy k oceňování bytů vycházejí z předpokladu, že tržní cena nemovitosti je výsledkem působení více vzájemně provázaných faktorů. Vedle samotných vlastností bytu hraje významnou roli také širší ekonomické prostředí, náklady výstavby, regulatorní omezení, kvalita lokality, dostupnost služeb a dopravy, technický stav nemovitosti či energetická náročnost budovy. Praktické přístupy k oceňování proto musí zohledňovat jak strukturální charakteristiky bytu, tak i jeho lokační a tržní souvislosti \cite{IVSC2022,AppraisalInstitute2020}.
+Současné přístupy k oceňování bytů vycházejí z předpokladu, že tržní cena nemovitosti je výsledkem působení více vzájemně provázaných faktorů. Vedle samotných vlastností bytu hraje významnou roli také širší ekonomické prostředí jako například náklady výstavby, regulatorní omezení, kvalita lokality, dostupnost služeb a dopravy, technický stav nemovitosti či energetická náročnost budovy. Praktické přístupy k oceňování proto musí zohledňovat jak strukturální charakteristiky bytu, tak i jeho lokační a tržní souvislosti~\cite{IVSC2022,AppraisalInstitute2020}.
 
 \section{Hlavní přístupy oceňování bytů}
 
-V odborné praxi se při oceňování bytů nejčastěji uplatňují tři základní přístupy: porovnávací, nákladový a výnosový. Každý z nich vychází z odlišného principu určení hodnoty nemovitosti a je vhodný pro jiný typ situace či účel ocenění \cite{IVSC2022,AppraisalInstitute2020}. V českém právním prostředí je rámec oceňování vymezen zákonem č. 151/1997 Sb., o oceňování majetku, a prováděcí vyhláškou č. 441/2013 Sb. \cite{Zakon151_1997,Vyhlaska441_2013}.
+V odborné praxi se při oceňování bytů nejčastěji uplatňují tři základní přístupy: porovnávací, nákladový a výnosový. Každý z nich vychází z odlišného principu určení hodnoty nemovitosti a je vhodný pro jiný typ situace či účel ocenění~\cite{IVSC2022,AppraisalInstitute2020}. V českém právním prostředí je rámec oceňování vymezen zákonem č. 151/1997 Sb., o oceňování majetku, a prováděcí vyhláškou č. 441/2013 Sb. \cite{Zakon151_1997,Vyhlaska441_2013}.
 
 \subsection*{Porovnávací přístup a hedonické oceňování}
-Porovnávací metoda vychází z komparace oceňovaného bytu s obdobnými objekty, které byly v nedávné době prodány nebo jsou aktuálně nabízeny ve stejné či srovnatelné lokalitě. Při tomto postupu se zohledňují zejména rozdíly ve velikosti, dispozici, technickém stavu, vybavení, poloze v rámci obce, dopravní dostupnosti nebo občanské vybavenosti. Přesnost této metody je přímo závislá na dostupnosti dostatečného množství kvalitních a skutečně srovnatelných tržních dat \cite{CNB2024RealitniTrh}.
+Porovnávací metoda vychází z komparace oceňovaného bytu s obdobnými objekty, které byly v nedávné době prodány nebo jsou aktuálně nabízeny ve stejné či srovnatelné lokalitě. Při tomto postupu se zohledňují zejména rozdíly ve velikosti, dispozici, technickém stavu, vybavení, poloze v obci, dopravní dostupnosti nebo občanské vybavenosti. Přesnost této metody je přímo závislá na dostupnosti dostatečného množství kvalitních a skutečně srovnatelných tržních dat~\cite{CNB2024RealitniTrh}.
 
-S tímto přístupem úzce souvisí \textbf{metoda hedonické ceny}, kterou lze chápat jako datově orientované rozšíření klasického porovnávání (viz sekce~\ref{subsec:linear_regression_theory}). Jejím teoretickým základem je koncept \cite{Lancaster1966}, podle něhož je statek (v tomto případě nemovitost) vnímán jako soubor dílčích charakteristik, jejichž kombinace vytváří celkový užitek a tím i tržní hodnotu. Rosen \cite{Rosen1974} tuto myšlenku formalizoval v rámci teorie implicitních trhů, kde je cena statku určena souhrnem cen jeho jednotlivých atributů. Cena bytu zde není vnímána pouze jako cena celku, nýbrž jako výsledek kombinace strukturálních, lokačních, kvalitativních a environmentálních atributů. Mezi tyto atributy patří například užitná plocha, dispozice, podlaží, technický stav budovy, vlastnická forma, energetická náročnost, geografická poloha či kvalita okolního prostředí. Hedonický přístup se tak snaží systematičtěji zachytit a kvantifikovat vliv jednotlivých parametrů na výslednou cenu, což tvoří teoretický základ pro moderní statistické modely. Ve~své klasické podobě odpovídá hedonický model lineární regresi, kde je logaritmus ceny vyjádřen jako lineární kombinace charakteristik nemovitosti.
+S tímto přístupem úzce souvisí \textbf{metoda hedonické ceny}, kterou lze chápat jako datově orientované rozšíření klasického porovnávání (viz sekce~\ref{subsec:linear_regression_theory}). Jejím teoretickým základem je koncept~\cite{Lancaster1966}, podle něhož je statek (v tomto případě nemovitost) vnímán jako soubor dílčích charakteristik, jejichž kombinace vytváří celkový užitek a tím i tržní hodnotu. Rosen tuto myšlenku formalizoval v teorii implicitních trhů, kde je cena statku určena souhrnem cen jeho jednotlivých atributů~\cite{Rosen1974}. Cena bytu zde není vnímána pouze jako cena celku, nýbrž jako výsledek kombinace strukturálních, lokačních, kvalitativních a environmentálních atributů. Mezi tyto atributy patří například užitná plocha, dispozice, podlaží, technický stav budovy, vlastnická forma, energetická náročnost, geografická poloha či kvalita okolního prostředí. Hedonický přístup se tak snaží systematičtěji zachytit a kvantifikovat vliv jednotlivých parametrů na výslednou cenu, což tvoří teoretický základ pro moderní statistické modely.
 
 \subsection*{Nákladový přístup}
-Nákladová metoda vychází z nákladů, které by bylo nutné vynaložit na pořízení nebo reprodukci obdobné nemovitosti v současných podmínkách. Od takto stanovené hodnoty se následně odečítá opotřebení, funkční nedostatky a další formy znehodnocení. Tento přístup se uplatňuje zejména v případech, kdy není k dispozici dostatek srovnatelných tržních transakcí, a také u specifických objektů či novostaveb. V případě bytů však bývá jeho využití omezenější, neboť reprodukční náklady nedokážou plně zachytit vliv lokality a aktuální tržní rovnováhu mezi nabídkou a poptávkou \cite{IVSC2022,CNB2024RezidencniTrh}.
+Nákladová metoda vychází z nákladů, které by bylo nutné vynaložit na pořízení nebo reprodukci obdobné nemovitosti v současných podmínkách. Od takto stanovené hodnoty se následně odečítá opotřebení, funkční nedostatky a další formy znehodnocení. Tento přístup se uplatňuje zejména v případech, kdy není k dispozici dostatek srovnatelných tržních transakcí, a také u specifických objektů či novostaveb. V případě bytů však bývá jeho využití omezenější, neboť reprodukční náklady nedokážou plně zachytit vliv lokality a aktuální tržní rovnováhu mezi nabídkou a poptávkou~\cite{IVSC2022,CNB2024RezidencniTrh}.
 
 \subsection*{Výnosový přístup}
-Výnosová metoda odvozuje hodnotu bytu od očekávaných příjmů, které může nemovitost generovat, typicky formou nájemného. Podstatou je převod budoucích výnosů na současnou hodnotu, přičemž se zohledňují provozní náklady, míra rizika a požadovaná výnosnost investora. Tato metoda nachází uplatnění především při investičním pohledu na nemovitost, tedy v situacích, kdy je byt pořizován za účelem generování pravidelného výnosu. U běžného vlastnického bydlení hraje sekundární roli, neboť kupující často zohledňují i jiné než čistě ekonomické faktory jako specifické potřeby rodiny, kvalita sousedských vztahů nebo estetický dojem z nemovitosti \cite{IVSC2022}.
+Výnosová metoda odvozuje hodnotu bytu od očekávaných příjmů, které může nemovitost generovat, typicky formou nájemného. Podstatou je převod budoucích výnosů na současnou hodnotu, přičemž se zohledňují provozní náklady, míra rizika a požadovaná výnosnost investora. Tato metoda nachází uplatnění především při investičním pohledu na nemovitost, tedy v situacích, kdy je byt pořizován za účelem generování pravidelného výnosu. U běžného vlastnického bydlení hraje sekundární roli, neboť kupující často zohledňují i jiné než čistě ekonomické faktory jako specifické potřeby rodiny, kvalita sousedských vztahů nebo estetický dojem z nemovitosti~\cite{IVSC2022}.
 
 \subsection{Nabídková a realizovaná cena}
 \label{subsec:offer_vs_transaction}
 
-V této práci je cílovou proměnnou nabídková cena, tedy cena uvedená v inzerátu. Ta se může lišit od realizované ceny, za kterou byla nemovitost skutečně prodána. Rozdíl mezi oběma hodnotami může vznikat v důsledku vyjednávání, délky inzerce, tržní situace nebo cenové strategie prodávajícího \cite{CNB2024RealitniTrh,CaseShiller1989}.
+Cílovou proměnnou této práce je nabídková cena, tedy cena uvedená v inzerátu. Ta se může lišit od realizované ceny, za kterou byla nemovitost skutečně prodána. Rozdíl mezi oběma hodnotami může vznikat v důsledku vyjednávání, délky inzerce, tržní situace nebo cenové strategie prodávajícího~\cite{CNB2024RealitniTrh,CaseShiller1989}.
 
 \subsection*{Syntéza a shrnutí přístupů}
-Z uvedeného přehledu vyplývá, že volba metodiky se odvíjí od povahy nemovitosti, účelu ocenění a dostupnosti informací. U bytů je za nejvhodnější a nejvíce vypovídající považován \textbf{porovnávací přístup}, neboť nejlépe odráží skutečné tržní chování a umožňuje nejvěrněji zachytit vliv lokality i specifických vlastností jednotky \cite{IVSC2022,CNB2024RealitniTrh}.
+Z uvedeného přehledu je patrné, že volba metodiky se odvíjí od povahy nemovitosti, účelu ocenění a dostupnosti informací. U bytů je za nejvhodnější a nejpřesnější považován \textbf{porovnávací přístup}, neboť nejlépe odráží skutečné tržní chování a umožňuje nejvěrněji zachytit vliv lokality i specifických vlastností jednotky~\cite{IVSC2022,CNB2024RealitniTrh}.
 
 V reálných podmínkách je však tržní cena ovlivněna velkým množstvím vzájemně provázaných faktorů, jejichž manuální vyhodnocování je u rozsáhlých datových souborů neefektivní. Právě komplexita těchto vztahů a potřeba přesnějšího zachycení hedonických atributů vytváří prostor pro využití metod strojového učení, které dokáží identifikovat i komplexnější vazby mezi vlastnostmi nemovitosti a její tržní cenou.
 
-\chapter{Metody strojového učení pro odhad cen bytů}
+
+\section{Metody strojového učení pro odhad cen bytů}
 \label{chap:ml_theory}
 
-Tato kapitola vymezuje teoretický rámec pro návrh, trénování a vyhodnocení prediktivních modelů. Nejprve je formálně definována predikční úloha, poté jsou diskutovány statistické vlastnosti cen nemovitostí (šikmost, heteroskedasticita, prostorová závislost) a jejich důsledky pro volbu transformace cílové proměnné. Následuje specifikace cílové proměnné (včetně logaritmické transformace a Duanova smearing estimatoru) a vstupních proměnných. Dále je představen návrh modelů od jednoduchých benchmarků po flexibilní nelineární metody (XGBoost). Zvláštní pozornost je věnována interpretaci modelů, konformním predikčním intervalům a SHAP hodnotám. Závěr kapitoly popisuje způsob validace pomocí křížové validace a výběr chybových metrik.
+Tato sekce vymezuje teoretický rámec pro návrh, trénování a vyhodnocení prediktivních modelů. Nejprve je formálně definována predikční úloha, poté jsou diskutovány statistické vlastnosti cen nemovitostí (šikmost, heteroskedasticita, prostorová závislost) a jejich důsledky pro volbu transformace cílové proměnné. Následuje specifikace cílové proměnné (včetně logaritmické transformace a Duanova smearing estimatoru) a vstupních proměnných. Dále je představen návrh modelů od jednoduchých benchmarků po flexibilní nelineární metody (XGBoost). Zvláštní pozornost je věnována interpretaci modelů, konformním predikčním intervalům a SHAP hodnotám. Závěr této sekce popisuje způsob validace pomocí křížové validace a výběr chybových metrik.
 
 \section{Definice predikční úlohy}
 \label{sec:prediction_task}
 
-Úloha je formulována jako regresní problém v rámci učení s učitelem. Cílem je odhadnout nabídkovou cenu bytu na základě souboru jeho strukturálních a lokalizačních charakteristik.
+Úloha je formulována jako regresní problém v úlohách učení s učitelem. Cílem je odhadnout nabídkovou cenu bytu na základě souboru jeho strukturálních a lokalizačních charakteristik.
 
 Nechť $\mathcal{X} \subseteq \mathbb{R}^d$ označuje $d$-rozměrný prostor vstupních příznaků a $\mathcal{Y} \subset \mathbb{R}^+$ prostor kladných cílových hodnot (nabídkových cen nemovitostí). Předpokládejme, že vztah mezi vlastnostmi bytu a jeho cenou lze popsat stochastickým modelem
 \begin{equation}
@@ -101,25 +103,19 @@ hledáme odhad parametrů $\hat{\theta}$, který minimalizuje zvolenou ztrátovo
     \hat{y}_* = f(\mathbf{x}_*; \hat{\theta}).
 \end{equation}
 
-Tento přístup odpovídá hedonickému pojetí ceny, podle něhož je hodnota nemovitosti určena kombinací jejích parciálních vlastností \cite{Lancaster1966,Rosen1974}.
-
-
-
-
-
-Modely použité v této práci proto odhadují nabídkovou cenu, nikoli přímo transakční cenu. Výsledky je nutné interpretovat v tomto kontextu.
+Tento přístup odpovídá hedonickému pojetí ceny, podle něhož je hodnota nemovitosti určena kombinací jejích parciálních vlastností~\cite{Lancaster1966,Rosen1974}.
 
 
 \subsection{Statistické vlastnosti cen nemovitostí}
 \label{subsec:price_distribution}
 
-Ceny nemovitostí mají několik vlastností, které je nutné zohlednit při návrhu predikčního modelu. Především jde o výraznou heterogenitu: byty se liší velikostí, stavem, typem vlastnictví, vybavením i lokalitou, takže nelze očekávat jednoduchý jednotný vztah mezi vstupními proměnnými a cenou \cite{Lancaster1966,Rosen1974}.
+Ceny nemovitostí mají několik vlastností, které je nutné zohlednit při návrhu predikčního modelu. Především jde o výraznou heterogenitu: byty se liší velikostí, stavem, typem vlastnictví, vybavením i lokalitou, takže nelze očekávat jednoduchý jednotný vztah mezi vstupními proměnnými a cenou~\cite{Lancaster1966,Rosen1974}.
 
-Rozdělení cen bývá v praxi výrazně pravostranně šikmé, většina nemovitostí se nachází ve středních cenových hladinách, zatímco menší počet velmi drahých jednotek vytváří dlouhý pravý ocas. Z tohoto důvodu se v hedonických aplikacích často pracuje s logaritmem ceny, který snižuje vliv extrémních hodnot a umožňuje interpretovat chyby i vztahy spíše relativně než absolutně \cite{GoodmanThibodeau2003,Miller2022HedonicGAM}.
+Rozdělení cen bývá v praxi výrazně pravostranně šikmé: většina nemovitostí se nachází ve středních cenových hladinách, zatímco menší počet velmi drahých jednotek vytváří dlouhý pravý ocas. Z tohoto důvodu se v hedonických aplikacích často pracuje s logaritmem ceny, který snižuje vliv extrémních hodnot a umožňuje chyby interpretovat relativně, nikoli absolutně~\cite{GoodmanThibodeau2003,Miller2022HedonicGAM}.
 
-Další důležitou vlastností je heteroskedasticita, tedy proměnlivý rozptyl reziduí napříč segmenty trhu. U dražších, větších nebo atypických nemovitostí může být absolutní chyba přirozeně vyšší než u standardních bytů \cite{Fletcher2000Heteroscedasticity,Stevenson2004Heteroscedasticity}.
+Další důležitou vlastností je heteroskedasticita, tedy proměnlivý rozptyl reziduí napříč segmenty trhu. U dražších, větších nebo atypických nemovitostí může být absolutní chyba přirozeně vyšší než u standardních bytů~\cite{Fletcher2000Heteroscedasticity,Stevenson2004Heteroscedasticity}.
 
-Ceny nemovitostí jsou navíc prostorově závislé. Byty ve stejné nebo podobné lokalitě sdílejí řadu prostorových charakteristik, například dostupnost dopravy, služeb, pracovních příležitostí nebo kvalitu prostředí. Literatura k hedonickému oceňování opakovaně upozorňuje, že zahrnutí prostorové struktury nebo rozdělení trhu na homogennější podmnožiny může zlepšit predikční přesnost \cite{GoodmanThibodeau2003,Muto2023Spatiotemporal}.
+Ceny nemovitostí jsou navíc prostorově závislé. Byty ve stejné nebo podobné lokalitě sdílejí řadu prostorových charakteristik, například dostupnost dopravy, služeb, pracovních příležitostí nebo kvalitu prostředí. Literatura k hedonickému oceňování opakovaně upozorňuje, že zahrnutí prostorové struktury nebo rozdělení trhu na homogennější podmnožiny může zlepšit predikční přesnost~\cite{GoodmanThibodeau2003,Muto2023Spatiotemporal}.
 
 Tyto vlastnosti ovlivňují volbu modelů i metrik. Pravostranná šikmost podporuje použití logaritmické transformace cílové proměnné, heteroskedasticita a rozdílné cenové hladiny motivují sledování relativních chyb a prostorová závislost zdůrazňuje význam lokalizačních proměnných. V praktické části jsou proto modely vyhodnocovány nejen pomocí absolutních chyb, ale také pomocí relativních metrik, zejména mediánové absolutní procentní chyby.
 
@@ -128,24 +124,24 @@ Tyto vlastnosti ovlivňují volbu modelů i metrik. Pravostranná šikmost podpo
 
 Cílovou proměnnou této práce je celková nabídková cena bytové jednotky uvedená v inzerátu. Hodnota je vyjádřena v českých korunách a pro \(i\)-tý byt z trénovací množiny ji lze zapsat jako
 \begin{equation}
-    y_i = \text{price\_total}_i \in \mathbb{R}^+.
+    y_i = \text{price total}_i \in \mathbb{R}^+.
 \end{equation}
 Úkolem modelu je pro nový byt s vektorem příznaků \(\mathbf{x}_*\) odhadnout hodnotu \(\hat{y}_*\), která bude co nejbližší jeho skutečné \(y_*\).
 
 Vlastnosti rozdělení cen, včetně pravostranné šikmosti a heteroskedasticity, jsou podrobně diskutovány v~sekci~\ref{subsec:price_distribution}. Z~těchto důvodů je v~práci použita logaritmická transformace cílové proměnné.
 
 \paragraph{Logaritmická transformace.}
-Z uvedených důvodů je v empirické literatuře běžné pracovat s logaritmem ceny namísto ceny samotné, protože tato transformace obvykle zmírňuje šikmost rozdělení a zároveň umožňuje přirozenější interpretaci změn v relativním, nikoli absolutním vyjádření \cite{GoodmanThibodeau2003,Miller2022HedonicGAM}. Transformovaná cílová proměnná je proto definována jako
+Transformovaná cílová proměnná je definována jako
 \begin{equation}
     z_i = \ln(y_i).
 \end{equation}
-Na této škále je v práci trénována sada modelů, konkrétně lineární regrese, ridge regrese, rozhodovací stromy a XGBoost. Výjimku představuje pouze globální medián, který pracuje přímo s původní cenou \(y_i\), kde by tento krok byl zbytečný.
+Na této škále je v práci trénována sada modelů, konkrétně lineární regrese, ridge regrese, rozhodovací stromy a XGBoost. Výjimkou je pouze globální medián, který pracuje přímo s původní cenou \(y_i\), kde by tento krok byl zbytečný.
 
-Převod predikce z logaritmické škály zpět do korun však není zcela přímočarý. Uvažujme obecný log-lineární model \(\ln(y_i) = f(\mathbf{x}_i) + \varepsilon_i\), kde \(f(\cdot)\) je libovolná regresní funkce a \(\varepsilon_i\) označuje reziduální složku. Střední hodnota ceny na původní škále je pak
+Převod predikce z logaritmické škály zpět do korun však není zcela přímočarý: Jensenova nerovnost~\cite{Jensen1906} implikuje, že \(\operatorname{E}[\exp(\varepsilon)] \neq \exp(\operatorname{E}[\varepsilon])\), a prostá exponenciace by proto systematicky podhodnocovala střední hodnotu ceny. Uvažujme obecný log-lineární model \(\ln(y_i) = f(\mathbf{x}_i) + \varepsilon_i\), kde \(f(\cdot)\) je libovolná regresní funkce a \(\varepsilon_i\) označuje reziduální složku. Střední hodnota ceny na původní škále je pak
 \begin{equation}
     \operatorname{E}[y_i \mid \mathbf{x}_i] = \exp\!\bigl(f(\mathbf{x}_i)\bigr) \cdot \operatorname{E}\!\bigl[\exp(\varepsilon_i)\bigr],
 \end{equation}
-Přirozeným neparametrickým kandidátem pro odhad \(\operatorname{E}[\exp(\varepsilon)]\) je Duanův smearing estimator \cite{Duan1983Smearing}.
+Přirozeným neparametrickým kandidátem pro odhad \(\operatorname{E}[\exp(\varepsilon)]\) je Duanův smearing estimator~\cite{Duan1983Smearing}.
 
 Korekční koeficient \(\hat{s}\) je odhadnut z trénovacích reziduí podle vztahu
 \begin{equation}
@@ -157,7 +153,7 @@ kde \(e_i = z_i - \hat{z}_i\) je reziduum \(i\)-tého pozorování na logaritmic
 \end{equation}
 
 \paragraph{Cena za metr čtvereční.}
-Cena za metr čtvereční, tedy \(y_i / \text{plocha}_i\), je v této práci používána pouze jako pomocná analytická veličina pro explorační analýzu, detekci extrémních hodnot a interpretaci výsledků v jednotlivých segmentech trhu. Nepředstavuje však cílovou proměnnou modelů. Výstupy všech predikčních modelů je proto třeba interpretovat jako odhad celkové nabídkové ceny bytu v českých korunách.
+Cena za metr čtvereční, tedy \(y_i / \text{plocha}_i\), je v této práci používána pouze jako pomocná analytická veličina pro explorační analýzu, detekci extrémních hodnot a interpretaci výsledků v jednotlivých segmentech trhu. Není však cílovou proměnnou modelů. Výstupy všech predikčních modelů je proto třeba interpretovat jako odhad celkové nabídkové ceny bytu v českých korunách.
 \subsection{Vstupní proměnné modelu}
 \label{subsec:model_features}
 
@@ -169,9 +165,9 @@ Predikce je proto nutné chápat jako odhad založený na dostupné strukturovan
 \section{Definice a návrh modelů}
 \label{sec:model_design}
 
-V této práci jsou modely řazeny od nejjednoduššího referenčního přístupu po flexibilnější nelineární metody. Taková posloupnost umožňuje posoudit, zda složitější model skutečně přináší dodatečnou predikční výkonnost oproti jednoduchým benchmarkům.
+Modely jsou v experimentu řazeny od nejjednoduššího referenčního přístupu po flexibilnější nelineární metody. Taková posloupnost umožňuje posoudit, zda složitější model skutečně přináší dodatečnou predikční výkonnost oproti jednoduchým benchmarkům.
 
-\subsection{Referenční baseline model globální medián}
+\subsection*{Referenční baseline model globální medián}
 \label{subsec:baseline_models}
 
 Referenční baseline model slouží jako jednoduchý srovnávací bod, vůči němuž se hodnotí přínos složitějších modelů. Jeho cílem není dosáhnout nejlepší predikční přesnosti, ale nastavit minimální úroveň výkonu, kterou by měl smysluplný model překonat. Podobný princip jednoduchých referenčních modelů je
@@ -179,55 +175,55 @@ běžný v praktickém strojovém učení, kde pomáhá odlišit skutečný pred
 \cite{Pedregosa2011ScikitLearn}.
 
 Globální medián predikuje pro všechna pozorování stejnou hodnotu, konkrétně medián cílové proměnné v trénovací množině. Je vhodný jako robustní baseline, protože medián je méně citlivý na extrémní hodnoty než aritmetický průměr,
-což je důležité u pravostranně šikmých cen nemovitostí \cite{Tukey1977EDA}.
+což je důležité u pravostranně šikmých cen nemovitostí~\cite{Tukey1977EDA}.
 Model ignoruje všechny vstupní proměnné, a proto nedokáže zachytit rozdíly mezi byty podle velikosti, stavu nebo lokality.
 
-\subsection{Lineární regrese a hedonické formulace ceny}
+\subsection*{Lineární regrese a hedonické formulace ceny}
 \label{subsec:linear_regression_theory}
 
 Hedonický model předpokládá, že cena nemovitosti je dána souhrnem jejích pozorovaných charakteristik a náhodné složky. Představuje základní přístup pro specifikaci ceny, kde v klasické lineární formulaci lze cenu $y_i$ zapsat jako
 \begin{equation}
-    y_i = \beta_0 + \sum_{j=1}^{p}\beta_j x_{ij} + \varepsilon_i,
+    y_i = \beta_0 + \sum_{j=1}^{d}\beta_j x_{ij} + \varepsilon_i,
 \end{equation}
 kde koeficienty $\beta_j$ vyjadřují parciální vztah mezi jednotlivými charakteristikami a cenou při zachování ostatních proměnných konstantních.
 
-Lineární regrese tak slouží jako základní model pro tuto hedonickou specifikaci. Její hlavní výhodou je jednoduchost, rychlý odhad a relativně snadná interpretace koeficientů, což z ní v kontextu oceňování bytů činí transparentní srovnávací model. Hlavními omezeními tohoto přístupu jsou však striktní předpoklad lineárního vztahu, citlivost na multikolinearitu a omezená schopnost zachytit komplexní nelinearity a interakce, které jsou pro realitní data typické.
+Lineární regrese tak slouží jako základní model pro tuto hedonickou specifikaci~\cite{Weisberg2014Applied}. Její hlavní výhodou je jednoduchost, rychlý odhad a relativně snadná interpretace koeficientů, což z ní v kontextu oceňování bytů činí transparentní srovnávací model. Hlavními omezeními tohoto přístupu jsou však striktní předpoklad lineárního vztahu, citlivost na multikolinearitu a omezená schopnost zachytit komplexní nelinearity a interakce, které jsou pro realitní data typické.
 
 Hedonický model je navíc třeba chápat primárně jako statistický a predikční nástroj, nikoli jako kauzální identifikaci vlivu jednotlivých atributů. Z tohoto důvodu je v této práci důraz kladen především na celkový predikční výkon modelů a jejich schopnost efektivně zachytit nelineární vztahy mezi vlastnostmi bytu a jeho výslednou cenou.
 
-\subsection{Ridge regrese}
+\subsection*{Ridge regrese}
 \label{subsec:ridge_regression_theory}
 
 Ridge regrese rozšiřuje lineární regresi o L2 regularizaci, která penalizuje velké hodnoty koeficientů. Odhad minimalizuje součet čtvercových chyb doplněný o penalizační člen
 \begin{equation}
-    \min_{\beta_0,\beta_1,\ldots,\beta_p}
-    \sum_{i=1}^{n}\left(y_i - \beta_0 - \sum_{j=1}^{p}\beta_j x_{ij}\right)^2
-    + \lambda \sum_{j=1}^{p}\beta_j^2,
+    \min_{\beta_0,\beta_1,\ldots,\beta_d}
+    \sum_{i=1}^{n}\left(y_i - \beta_0 - \sum_{j=1}^{d}\beta_j x_{ij}\right)^2
+    + \lambda \sum_{j=1}^{d}\beta_j^2,
 \end{equation}
-kde \(\lambda \geq 0\) určuje sílu regularizace. Tím se snižuje varianci modelu a zvyšuje stabilita odhadu zejména při korelovaných vstupních proměnných \cite{HoerlKennard1970}. Nevýhodou je, že regularizace zavádí vychýlení (bias) a model zůstává lineární, takže sama o sobě neřeší nelineární vztahy mezi atributy nemovitosti a cenou.
+kde \(\lambda \geq 0\) určuje sílu regularizace. Tím se snižuje rozptyl modelu a zvyšuje stabilita odhadu zejména při korelovaných vstupních proměnných~\cite{HoerlKennard1970}. Nevýhodou je, že regularizace zavádí vychýlení (bias) a model zůstává lineární, takže sama o sobě neřeší nelineární vztahy mezi atributy nemovitosti a cenou.
 
-\subsection{Rozhodovací stromy}
+\subsection*{Rozhodovací stromy}
 \label{subsec:decision_tree_theory}
 
-Rozhodovací strom rozděluje prostor vstupních proměnných pomocí pravidel typu \uv{pokud--pak}. V regresní úloze je predikcí v listu stromu obvykle průměrná hodnota cílové proměnné pro trénovací pozorování v daném listu \cite{Breiman1984CART}. Formálně lze predikci zapsat jako
+Rozhodovací strom rozděluje prostor vstupních proměnných pomocí pravidel typu \uv{pokud--pak}. V regresní úloze je predikcí v listu stromu obvykle průměrná hodnota cílové proměnné pro trénovací pozorování v daném listu~\cite{Breiman1984CART}. Formálně lze predikci zapsat jako
 \begin{equation}
     \hat{y}(x) = \sum_{m=1}^{M} c_m \, \mathbb{I}(x \in R_m),
 \end{equation}
-kde \(R_m\) označuje oblast definovanou stromem, \(c_m\) konstantní predikci v listu a \(\mathbb{I}\) je indikátorová funkce. Při konstrukci stromu se volí rozdělení, které nejvíce zlepší homogenitu podmnožin; v regresi se toto zlepšení obvykle měří poklesem variability nebo reziduálního součtu čtverců. Výhodou stromů je schopnost zachytit nelinearity a interakce, nevýhodou je vysoká variance a náchylnost k přeučení.
+kde \(R_m\) označuje oblast definovanou stromem, \(c_m\) konstantní predikci v listu a \(\mathbb{I}\) je indikátorová funkce. Při konstrukci stromu se volí rozdělení, které nejvíce zlepší homogenitu podmnožin; v regresi se toto zlepšení obvykle měří poklesem variability nebo reziduálního součtu čtverců. Výhodou stromů je schopnost zachytit nelinearity a interakce, nevýhodou je vysoký rozptyl a náchylnost k přeučení.
 
-\subsection{Gradientně posilované stromy a XGBoost}
+\subsection*{Gradientně posilované stromy a XGBoost}
 \label{subsec:gradient_boosting_xgboost}
 
-Gradientně posilované stromy (gradient boosting) vytvářejí kolekci rozhodovacích stromů, které jsou přidávány postupně; každý další strom se učí opravovat chyby předchozího ansámblu ve směru gradientu zvolené ztrátové funkce \cite{Friedman2001GBM}. Tento přístup kombinuje mnoho jednoduchých prediktorů do silného modelu, což umožňuje zachytit složité nelineární vztahy a interakce mezi vstupními proměnnými. Mezi hlavní výhody patří vysoká predikční přesnost a schopnost práce s heterogenními daty (numerickými, kategoriálními i lokalizačními). Nevýhody zahrnují vyšší výpočetní náročnost, citlivost na volbu hyperparametrů a nižší transparentnost oproti lineárním modelům nebo jednotlivým rozhodovacím stromům.
+Gradientně posilované stromy (gradient boosting) vytvářejí kolekci rozhodovacích stromů, které jsou přidávány postupně; každý další strom se učí opravovat chyby předchozího ansámblu ve směru gradientu zvolené ztrátové funkce~\cite{Friedman2001GBM}. Tento přístup kombinuje mnoho jednoduchých prediktorů do jednoho silného modelu, který dokáže zachytit složité nelineární vztahy a interakce mezi vstupními proměnnými. Mezi hlavní výhody patří vysoká predikční přesnost a schopnost práce s heterogenními daty (numerickými, kategoriálními i lokalizačními). Nevýhody zahrnují vyšší výpočetní náročnost, citlivost na volbu hyperparametrů a nižší transparentnost oproti lineárním modelům nebo jednotlivým rozhodovacím stromům.
 
-XGBoost je efektivní a škálovatelná implementace gradientního boostingu, která přidává řadu technických zlepšení: regulaci pro kontrolu složitosti modelu, optimalizované algoritmy pro učení stromů, efektivní zpracování řídkých dat a další výpočetní optimalizace \cite{ChenGuestrin2016XGBoost}. Díky těmto vlastnostem se XGBoost často používá jako hlavní nelineární model v aplikacích s velkými nebo heterogenními datovými sadami, včetně predikce cen nemovitostí, kde jsou očekávány nelineární vztahy a mnohé interakce mezi atributy. Silnou stránkou XGBoost je obvykle jeho predikční výkon; na druhou stranu vyžaduje pečlivé ladění hyperparametrů, je méně přímo interpretovatelný než lineární modely a při nevhodném nastavení existuje riziko přeučení.
+XGBoost je implementace gradientního boostingu, která přidává řadu technických zlepšení: regulaci pro kontrolu složitosti modelu, optimalizované algoritmy pro učení stromů, efektivní zpracování řídkých dat a další výpočetní optimalizace~\cite{ChenGuestrin2016XGBoost}. Díky těmto vlastnostem se XGBoost často používá jako hlavní nelineární model v aplikacích s velkými nebo heterogenními datovými sadami, včetně predikce cen nemovitostí, kde jsou očekávány nelineární vztahy a mnohé interakce mezi atributy. Silnou stránkou XGBoost je obvykle jeho predikční výkon; na druhou stranu vyžaduje pečlivé ladění hyperparametrů, je méně přímo interpretovatelný než lineární modely a při nevhodném nastavení existuje riziko přeučení.
 
 \section{Interpretace modelů}
 \label{sec:model_interpretation}
 
 Interpretace modelů slouží k porozumění tomu, jak model využívá vstupní proměnné k predikci. U predikčních modelů je však nutné odlišovat interpretaci modelového chování od kauzální interpretace. Skutečnost, že určitý příznak přispívá k predikci, sama o sobě neznamená, že daná vlastnost kauzálně způsobuje změnu ceny.
 
-\subsection{Interpretace lineárních modelů}
+\subsection*{Interpretace lineárních modelů}
 \label{subsec:linear_model_interpretation_theory}
 
 U lineárních modelů je predikce tvořena váženým součtem vstupních příznaků.
@@ -236,21 +232,21 @@ Koeficienty proto poskytují přímou informaci o směru a velikosti asociace me
 V praxi je však třeba opatrnosti. Koeficienty mohou být ovlivněny škálováním, one-hot kódováním, regularizací i korelacemi mezi vstupními proměnnými. U ridge regrese navíc regularizace záměrně zmenšuje koeficienty, takže jejich absolutní velikost nelze chápat jako čistý ekonomický efekt
 daného atributu.
 
-\subsection{Význam příznaků u stromových modelů}
+\subsection*{Význam příznaků u stromových modelů}
 \label{subsec:tree_feature_importance_theory}
 
 U stromových a ansámblových modelů nelze predikci popsat jedním koeficientem. Často se proto používá \textit{feature importance}, která shrnuje, jak často a s jakým přínosem byl daný příznak využit při dělení uzlů. U gradientně posilovaných stromů se běžně sleduje například metrika \textit{gain}, tedy průměrné
-zlepšení ztrátové funkce dosažené rozdělením podle daného příznaku \cite{Breiman2001RandomForests,ChenGuestrin2016XGBoost}.
+zlepšení ztrátové funkce dosažené rozdělením podle daného příznaku~\cite{Breiman2001RandomForests,ChenGuestrin2016XGBoost}.
 
 Výhodou těchto metrik je jednoduchost a globální pohled na model. Nevýhodou je, že neukazují směr vlivu proměnné a mohou být zkreslené při korelovaných příznacích nebo při proměnných s větším počtem možných dělení
 \cite{Strobl2008ConditionalImportance}. Význam příznaků je proto vhodné chápat jako orientační diagnostiku, nikoli jako úplné vysvětlení cenotvorby.
 
 %---------------------------------------------------------------
-\subsection{Teoretické odvození konformního intervalu}
+\subsection*{Teoretické odvození konformního intervalu}
 \label{subsec:teoreticke_odvozeni_kvantilu}
 %---------------------------------------------------------------
 
-Aby bylo možné garantovat zvolenou úroveň spolehlivosti intervalu bez nutnosti přijímat restriktivní předpoklady o normálním rozdělení chyb, byl uplatněn princip vycházející z induktivní konformní predikce \cite{Vovk2005Algorithmic, Papadopoulos2002Inductive}.
+Aby bylo možné garantovat zvolenou úroveň spolehlivosti intervalu bez nutnosti přijímat restriktivní předpoklady o normálním rozdělení chyb, byl uplatněn princip vycházející z induktivní konformní predikce~\cite{Vovk2005Algorithmic, Papadopoulos2002Inductive}.
 
 \paragraph{1. Generování mimovzorkových reziduí}
 Proces pracuje s distribucí chyb, které simulují chování modelu při inferenci nad novými daty. Pro každé pozorování $i$ je mimovzorkové reziduum definováno jako:
@@ -269,7 +265,7 @@ Konkrétní hodnota tohoto kvantilu pro finální model a transformace na asymet
 \subsection{SHAP hodnoty}
 \label{subsec:shap_theory}
 
-SHAP hodnoty představují metodu pro vysvětlení jednotlivých predikcí pomocí sčítání příspěvků vstupních proměnných. Vycházejí z konceptu Shapleyho hodnot z kooperativní teorie her a rozkládají predikci modelu na základní hodnotu a příspěvky jednotlivých příznaků \cite{LundbergLee2017SHAP}. Díky tomu lze
+SHAP hodnoty představují metodu pro vysvětlení jednotlivých predikcí pomocí sčítání příspěvků vstupních proměnných. Vycházejí z konceptu Shapleyho hodnot z kooperativní teorie her a rozkládají predikci modelu na základní hodnotu a příspěvky jednotlivých příznaků~\cite{LundbergLee2017SHAP}. Díky tomu lze
 sledovat nejen globální důležitost proměnných, ale také lokální vysvětlení konkrétní predikce.
 
 Výhodou SHAP je jednotný rámec použitelný i pro složité nelineární modely a možnost zobrazit směr i velikost příspěvku jednotlivých proměnných. Omezením je vyšší výpočetní náročnost a také skutečnost, že SHAP vysvětluje chování
@@ -277,23 +273,23 @@ naučeného modelu, nikoli nutně skutečný kauzální mechanismus trhu.
 
 \section{Validace a hodnocení modelu}
 
-Validace a hodnocení modelu představují klíčovou fázi procesu vývoje predikčního modelu, jejímž cílem je ověřit jeho schopnost zobecnění na dosud neznámých datech. Toto umožňuje nejen porovnat jednotlivé  varianty modelů, ale také posoudit, do jaké míry bude výsledný model použitelný v reálných podmínkách. Současně slouží jako důležitý nástroj pro odhalení přeučení, případně dalších nedostatků, které by mohly negativně ovlivnit spolehlivost predikce.
+Validace ověřuje, zda se model dokáže zobecnit na dosud neviděná data. Lze tak porovnat jednotlivé varianty modelů a posoudit, do jaké míry bude výsledný model použitelný v reálných podmínkách. Zároveň pomáhá odhalit přeučení a další nedostatky, které by mohly negativně ovlivnit spolehlivost predikce.
 
 V rámci validace se model vyhodnocuje na datech, která nebyla použita při jeho trénování, aby bylo možné získat objektivnější odhad jeho výkonu. Na základě vhodně zvolených metrik lze následně posoudit jeho přesnost, stabilitu a celkovou prediktivní schopnost. Výsledky této analýzy poskytují podklad pro výběr nejvhodnějšího modelu a zároveň napomáhají optimalizaci jeho parametrů.
 
-\subsection{Cross-validace}
+\subsection*{Cross-validace}
 \label{subsec:cross_validation_theory}
 
 Cross-validace (křížová validace) je robustní statistická metoda používaná k odhadu zobecňovací schopnosti modelu. Postup spočívá v opakovaném rozdělení trénovací množiny na dílčí trénovací a validační části. Nejčastěji používaná varianta, $k$-fold cross-validace, rozděluje data do $k$ stejně velkých bloků (foldů). Model je v každém z $k$ běhů trénován na $k-1$ blocích a testován na zbývajícím bloku, který nebyl použit při učení.
 
 
 
-Výsledné skóre se poté agreguje (obvykle průměrem) přes všech $k$ běhů. Tento postup poskytuje stabilnější odhad výkonnosti než jediné náhodné rozdělení (\textit{hold-out} method) a je klíčový pro výběr modelu nebo ladění hyperparametrů \cite{Stone1974CrossValidation,Kohavi1995CrossValidation}. V této práci slouží cross-validace k porovnání kandidátních modelů výhradně na trénovací části dat. Testovací množina je striktně oddělena pro závěrečné objektivní ověření vybraného modelu, čímž se předchází úniku informací (\textit{data leakage}) do procesu výběru modelu. Tato technika je v~dalším textu označována jako out-of-fold cross-validace (OOF CV).
+Výsledné skóre se poté agreguje (obvykle průměrem) přes všech $k$ běhů. Tento postup poskytuje stabilnější odhad výkonnosti než jediné náhodné rozdělení (\textit{hold-out} method) a je klíčový pro výběr modelu nebo ladění hyperparametrů~\cite{Stone1974CrossValidation,Kohavi1995CrossValidation}. Cross-validace zde slouží k porovnání kandidátních modelů výhradně na trénovací části dat. Testovací množina je striktně oddělena pro závěrečné objektivní ověření vybraného modelu, čímž se předchází úniku informací (\textit{data leakage}) do procesu výběru modelu. Tato technika je v~dalším textu označována jako out-of-fold cross-validace (OOF CV).
 
-\subsection{Chybové metriky}
+\subsection*{Chybové metriky}
 \label{subsec:error_metrics_theory}
 
-Chybové metriky kvantifikují rozdíl mezi skutečnou cenou $y_i$ a predikovanou cenou $\hat{y}_i$. Pro hodnocení modelů predikce cen nemovitostí využíváme kombinaci absolutních a relativních metrik, jejichž přehled a vlastnosti jsou popsány v~odborné literatuře \cite{Hyndman2006ForecastAccuracy}.
+Chybové metriky kvantifikují rozdíl mezi skutečnou cenou $y_i$ a predikovanou cenou $\hat{y}_i$. Pro hodnocení modelů predikce cen nemovitostí využíváme kombinaci absolutních a relativních metrik, jejichž přehled a vlastnosti jsou popsány v~odborné literatuře~\cite{Hyndman2006ForecastAccuracy}.
 
 \paragraph{Průměrná absolutní chyba (MAE)}
 MAE vyjadřuje průměrnou velikost chyb v původních jednotkách (Kč). Její hlavní výhodou je sice přímá interpretovatelnost, pro hodnocení modelů cen nemovitostí však není zcela ideální, protože nezohledňuje proporci chyby vůči celkové hodnotě. Stejná absolutní odchylka má diametrálně odlišný význam u různě drahých objektů – chyba ve výši jednoho milionu korun u bytu s reálnou cenou tři miliony představuje hrubou nepřesnost, zatímco tatáž odchylka u nemovitosti v hodnotě dvaceti milionů je relativně zanedbatelná. Metrika je definována vztahem:
@@ -308,20 +304,20 @@ MAPE hodnotí chybu relativně ke skutečné ceně, což umožňuje porovnání 
 \end{equation}
 
 \paragraph{Vážená průměrná absolutní procentuální chyba (wMAPE)}
-V kontextu oceňování nemovitostí je často vhodnější metrikou wMAPE, která eliminuje extrémní vliv velmi levných jednotek tím, že chyby váží skutečnou cenou. V podstatě jde o poměr součtu absolutních chyb k součtu všech skutečných cen:
+V kontextu oceňování nemovitostí je často vhodnější metrikou wMAPE, která eliminuje extrémní vliv velmi levných jednotek tím, že chyby váží skutečnou cenou. Jde o poměr součtu absolutních chyb k součtu všech skutečných cen:
 \begin{equation}
     wMAPE = \frac{\sum_{i=1}^{n} |y_i - \hat{y}_i|}{\sum_{i=1}^{n} y_i} \times 100\,\%
 \end{equation}
 
-\paragraph{Mediánová absolutní procentuální chyba (medAPE)}
-Mediánová absolutní procentuální chyba (často označovaná též jako MdAPE) představuje robustní alternativu k metrikám založeným na aritmetickém průměru. Místo průměrování se vypočítá absolutní procentuální chyba pro každé pozorování a následně se z těchto hodnot určí medián:
+\paragraph{Mediánová absolutní procentuální chyba (MedAPE)}
+Mediánová absolutní procentuální chyba (často označovaná též jako MedAPE) je robustní alternativou k metrikám založeným na aritmetickém průměru. Místo průměrování se vypočítá absolutní procentuální chyba pro každé pozorování a následně se z těchto hodnot určí medián:
 
-$$medAPE = \text{median} \left( \left| \frac{y_i - \hat{y}_i}{y_i} \right| \right) \times 100\,\%$$
+$$\mathrm{MedAPE} = \operatorname{median} \left( \left| \frac{y_i - \hat{y}_i}{y_i} \right| \right) \times 100\,\%$$
 
-Hlavní předností této metriky je její vysoká odolnost vůči odlehlým hodnotám (outlierům). Na realitním trhu se běžně vyskytují cenové anomálie – například extrémně drahé luxusní byty nebo naopak nemovitosti s nestandardně nízkou cenou. U takových datových bodů může predikční model vykazovat obrovskou chybu, která by průměrové metriky jako MAE nebo MAPE neúměrně zkreslila a penalizovala jinak kvalitní model. Metrika medAPE vliv těchto extrémů potlačuje a ukazuje procentuální chybu, kterou model vykazuje u \uv{typické} nemovitosti. Právě proto je vhodným a stabilním kritériem pro finální výběr modelu, neboť nejlépe reflektuje reálnou odhadovanou prediktivní spolehlivost algoritmu na trhu.
+Hlavní předností této metriky je její vysoká odolnost vůči odlehlým hodnotám (outlierům). Na realitním trhu se běžně vyskytují cenové anomálie – například extrémně drahé luxusní byty nebo naopak nemovitosti s nestandardně nízkou cenou. U takových datových bodů může predikční model vykazovat obrovskou chybu, která by průměrové metriky jako MAE nebo MAPE neúměrně zkreslila a penalizovala jinak kvalitní model. Metrika MedAPE vliv těchto extrémů potlačuje a ukazuje procentuální chybu, kterou model vykazuje u \uv{typické} nemovitosti. Právě proto je vhodným a stabilním kritériem pro finální výběr modelu, neboť nejlépe reflektuje reálnou odhadovanou prediktivní spolehlivost algoritmu na trhu.
 
-\subsection{Koeficient determinace (\texorpdfstring{$R^2$}{R\^2})}
-\label{subsec:r2_theory  }
+\subsection*{Koeficient determinace (\texorpdfstring{$R^2$}{R\^2})}
+\label{subsec:r2_theory}
 
 Koeficient determinace $R^2$ vyjadřuje, jaký podíl variability cílové proměnné (ceny) je vysvětlen modelem. Porovnává součet čtverců reziduí (chyb modelu) se součtem čtverců celkové odchylky od průměrné ceny.
 
@@ -339,13 +335,13 @@ Hodnota $R^2$ se obvykle pohybuje v intervalu $[0, 1]$:
     \item $R^2 < 0$: Model je horší než predikce průměrem (může nastat u nelineárních modelů na testovacích datech) \cite{Kvalseth1985R2}.
 \end{itemize}
 
-Výhodou $R^2$ je jeho bezrozměrnost a intuitivní srovnatelnost různých typů regresních modelů. V této práci je používán jako doplňková metrika k MAE a wMAPE pro komplexní pohled na kvalitu prokladu dat. Všechny procentuální metriky (MAPE, wMAPE, medAPE) jsou uváděny vynásobené stem, tedy v~procentech.
+Výhodou $R^2$ je jeho bezrozměrnost a snadnou srovnatelnost různých typů regresních modelů. V této práci je používán jako doplňková metrika k MAE a wMAPE pro komplexní pohled na kvalitu prokladu dat. Všechny procentuální metriky (MAPE, wMAPE, MedAPE) jsou uváděny vynásobené stem, tedy v~procentech.
 
 %---------------------------------------------------------------
 \chapter{Sběr dat a předzpracování}
 \label{sec:data}
 %---------------------------------------------------------------
-Sběr dat představuje základní krok v analytickém procesu, protože kvalita a relevance získaných dat přímo ovlivňují všechny následující fáze včetně předzpracování, analýzy a modelování. Cílem této fáze je pořídit konzistentní a reprezentativní data, která dostatečně popisují řešený problém.
+Kvalita a relevance vstupních dat přímo ovlivňuje všechny navazující fáze analýzy. Cílem je pořídit konzistentní záznamy, které reprezentativně popisují sledovaný trh.
 
 V kontextu této práce se sběr dat týká procesu získávání surových záznamů z inzerátů bytů z veřejně dostupných realitních portálů (stav k 5. 1. 2026), jejich transformace do použitelného formátu a uložení pro další zpracování.
 \section{Zdroje a sběr dat}
@@ -356,15 +352,15 @@ Sběr dat byl plně automatizován, aby bylo možné proces kdykoli opakovat a z
 \item \textbf{API klient:} platforma poskytuje veřejné endpointy a vrací data ve formátu JSON.
 \item \textbf{Web scraping:} data se extrahují přímo z HTML, pokud API není k dispozici.
 \end{itemize}
-Vybraný portál veřejné endpointy poskytuje, takže byl použit API klient. Sběr probíhal ve třech krocích:
+Vybraný portál veřejné endpointy poskytuje, takže byl použit API klient (viz~\cite{Sreality}). Sběr probíhal ve třech krocích:
 \begin{description}
-\item[Stránkování.] Systém nejprve zjistí celkový počet inzerátů odpovídajících zadaným filtrům - v našem případě prodej bytů v celé ČR.
+\item[Stránkování.] Systém nejprve zjistí celkový počet inzerátů odpovídajících zadaným filtrům -- v našem případě prodej bytů v celé ČR.
 \item[Generování požadavků.] Na základě tohoto počtu vypočítá potřebný počet stránek a sestaví dávky URL pro dotazování API.
 \item[Rekonstrukce odkazů.] Pro každou nemovitost modul sestaví jak interní API endpoint pro surová data, tak veřejnou URL inzerátu.
 \end{description}
-Získaná data ve formátu JSON byla transformována do relační databáze PostgreSQL. Relevantní atributy byly extrahovány, vnořené struktury rozbaleny a datové typy explicitně převedeny - celá čísla, reálná čísla, řetězce i časová razítka. PostgreSQL byl zvolen proto, že nabízí silné záruky integrity dat při paralelním zápisu a flexibilní dotazovací jazyk vhodný pro následnou analýzu. Pro rychlý sběr postačilo jednotabulkové schéma.
+Získaná data ve formátu JSON byla transformována do relační databáze PostgreSQL. Relevantní atributy byly extrahovány, vnořené struktury rozbaleny a datové typy explicitně převedeny -- celá čísla, reálná čísla, řetězce i časová razítka. PostgreSQL byl zvolen proto, že nabízí silné záruky integrity dat při paralelním zápisu a flexibilní dotazovací jazyk vhodný pro následnou analýzu. Pro rychlý sběr postačilo jednotabulkové schéma.
 
-Výsledný dataset obsahuje 13,184 záznamů. Byl náhodně rozdělen v poměru 90:10 na trénovací a testovací sadu; všechny další kroky popsané v této kapitole se týkají výhradně trénovací části.
+Výsledný dataset obsahuje 13 184 záznamů. Byl náhodně rozdělen v poměru 90:10 na trénovací a testovací sadu; všechny další kroky popsané v této kapitole se týkají výhradně trénovací části.
 
 \subsection{Body zájmu (POI)}
 Pro zachycení vlivu občanské vybavenosti a dopravní infrastruktury na cenu bytu byla získána také prostorová data z~platformy OpenStreetMap~\cite{OpenStreetMap} pomocí nástroje Overpass Turbo~\cite{OverpassTurbo}. Extrahovány byly záznamy o~zastávkách MHD, obchodech a souřadnice center 14~krajských měst. Data byla stažena ve~formátu GeoJSON a konvertována do~CSV pro~další zpracování. Pro~každý byt byla následně pomocí OSRM (Open Source Routing Machine) API~\cite{OSRM} vypočtena doba jízdy do~centra nejbližšího krajského města. Přehled zdrojů a počtů záznamů uvádí tabulka~\ref{tab:poi_overview}.
@@ -377,21 +373,21 @@ Pro zachycení vlivu občanské vybavenosti a dopravní infrastruktury na cenu b
 \toprule
 Dataset & Počet záznamů & Souřadnice \\
 \midrule
-Veřejná doprava & 71\,447 & lat/lon \\
-Obchody & 3\,310 & lat/lon \\
+Veřejná doprava & 44\,272 & lat/lon \\
+Obchody & 3\,286 & lat/lon \\
 Centra měst & 14 & lat/lon \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Datová sada veřejné dopravy obsahuje 71\,447 záznamů kategorizovaných do šesti skupin: autobusová zastávka (66\,316), vlakové nádraží (2\,634), tramvajová zastávka (1\,607), veřejná doprava obecně (752), metro (121) a železniční zastávka (16). Datová sada obchodů čítá 3\,310 záznamů rozdělených na supermarkety (2\,056) a samoobsluhy (1\,253). Pro~14~krajských měst byly manuálně stanoveny souřadnice jejich geometrických center.
+Datová sada veřejné dopravy obsahuje 44\,272 záznamů kategorizovaných do šesti skupin: autobusová zastávka (40\,413), vlakové nádraží (1\,752), tramvajová zastávka (1\,360), veřejná doprava obecně (613), metro (120) a železniční zastávka (14). Datová sada obchodů čítá 3\,310 záznamů rozdělených na supermarkety (2\,056) a samoobsluhy (1\,253). Pro~14~krajských měst byly manuálně stanoveny souřadnice jejich geometrických center.
 
 \section{Kvalita dat a validace}
 \label{sec:data_quality_validation}
 
 Během procesu sběru, ukládání a následného předzpracování dat byly provedeny základní validační kontroly. Jejich cílem bylo odstranit technicky chybné, duplicitní nebo analyticky nepoužitelné záznamy, které by mohly negativně ovlivnit výsledky deskriptivní analýzy i následné modelování.
 
-Již ve fázi sběru dat byly vyloučeny některé odpovědi API, které obsahovaly neplatné odkazy na inzeráty nebo vracely poškozená či neúplná data. Dále byly odstraněny záznamy s chybějícími klíčovými atributy, zejména lokalizačními informacemi, protože poloha nemovitosti představuje jeden ze zásadních faktorů při odhadu ceny bytu. Součástí kontroly bylo také odstranění duplicitních inzerátů s identickými atributy, s výjimkou technických identifikátorů a dalších webově specifických polí.
+Již ve fázi sběru dat byly vyloučeny některé odpovědi API, které obsahovaly neplatné odkazy na inzeráty nebo vracely poškozená či neúplná data. Dále byly odstraněny záznamy s chybějícími důležitými atributy, zejména lokalizačními informacemi, protože poloha nemovitosti je jedním z hlavních faktorů při odhadu ceny bytu. Součástí kontroly bylo také odstranění duplicitních inzerátů s identickými atributy, s výjimkou technických identifikátorů a dalších webově specifických polí.
 
 Po načtení dat do databáze byly aplikovány základní filtry uvedené v tabulce~\ref{tab:data_validation_filters}. Tyto filtry odstraňují záznamy s neplatnou cílovou proměnnou, chybně uvedenými hodnotami plochy nebo souřadnicemi mimo očekávaný geografický rozsah České republiky.
 
@@ -399,37 +395,29 @@ Po načtení dat do databáze byly aplikovány základní filtry uvedené v tabu
 \centering
 \caption{Základní validační filtry použité při čištění dat}
 \label{tab:data_validation_filters}
-% Change the last 'l' to 'p{7cm}' (adjust the 7cm up or down as needed)
-\begin{tabular}{>{\raggedright\arraybackslash}p{3cm}>{\raggedright\arraybackslash}p{5cm}p{5cm}}
+\begin{tabular}{>{\raggedright\arraybackslash}p{2cm}>{\raggedright\arraybackslash}p{5cm}p{5cm}}
 \toprule
 \textbf{Filtr} & \textbf{Podmínka} & \textbf{Popis} \\
 \midrule
 Cena & \texttt{price\_total > 0} & Odstranění záznamů s nekladnou nebo chybějící cenou\\
 Užitná plocha & \texttt{usable\_area\_m2 > 0} nebo \texttt{NA} & Odstranění záporných hodnot užitné plochy \\
 Celková plocha & \texttt{total\_area\_m2 > 0} nebo \texttt{NA} & Odstranění záporných hodnot celkové plochy \\
-Souřadnice & \texttt{latitude} $\in (48.0, 51.5)$ a \texttt{longitude} $\in (12.0, 19.0)$ & Odstranění záznamů se souřadnicemi mimo území ČR \\
+Souřadnice & \texttt{latitude} $\in (48{,}0,\ 51{,}5)$ a \texttt{longitude} $\in (12{,}0,\ 19{,}0)$ & Odstranění záznamů se souřadnicemi mimo území ČR \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-U plošných proměnných nebyla samotná chybějící hodnota považována za důvod k odstranění záznamu, protože některé inzeráty nemusí uvádět všechny typy ploch. Odstraňovány proto byly pouze hodnoty zjevně neplatné, tedy nulové nebo záporné. Naproti tomu u cílové proměnné \texttt{price\_total} byla vyžadována kladná hodnota, protože bez platné ceny nelze záznam použít pro úlohu učení s učitelem.
+U plošných proměnných nebyla samotná chybějící hodnota považována za důvod k odstranění záznamu, protože některé inzeráty nemusí uvádět všechny typy ploch. Odstraňovány proto byly pouze hodnoty zjevně neplatné, tedy nulové nebo záporné. Naproti tomu u cílové proměnné \texttt{price total} byla vyžadována kladná hodnota, protože bez platné ceny nelze záznam použít pro úlohu učení s učitelem.
 
 Kontrola souřadnic byla nastavena tak, aby zachovala pouze záznamy ležící v přibližném geografickém rozsahu České republiky. Tento filtr sloužil především k odstranění technicky chybných nebo chybně zařazených záznamů, u nichž by poloha neodpovídala analyzovanému trhu.
-Pro zajištění integrity dat byla implementována podmíněná strategie imputace pro chybějící data nemovitostí (viz obrázek \ref{fig:missings}). Konkrétně atributy \textbf{Has loggia} a \textbf{Has cellar} slouží jako spolehlivé indikátory pro příslušná pole velikostí. Protože API ponechává tyto plošné hodnoty jako \texttt{null} místo nuly, pokud dané vybavení není specifikované, explicitně jsme doplnili hodnotu 0 pro \textbf{Loggia area} a \textbf{Cellar area} u všech záznamů, kde odpovídající indikátor nabyl hodnoty 0.
-
+Pro zajištění integrity dat byla implementována podmíněná strategie imputace pro chybějící data nemovitostí (viz obrázek \ref{fig:missings}). Konkrétně atributy \textbf{Has loggia} a \textbf{Has cellar} slouží jako spolehlivé indikátory pro příslušná pole velikostí. Protože API ponechává tyto plošné hodnoty jako \texttt{null} místo nuly, pokud dané vybavení není specifikované, byla explicitně doplněna hodnota 0 pro \textbf{Loggia area} a \textbf{Cellar area} u všech záznamů, kde odpovídající indikátor nabyl hodnoty 0.
+\newpage
 \section{Explorační analýza dat (EDA)}
-Průzkumná analýza dat slouží k počátečnímu porozumění datové sadě, odhalení
-odlehlých hodnot, chybějících hodnot, tvaru rozdělení proměnných a základních
-vztahů mezi nimi \cite{Tukey1977EDA}. V této práci byla provedena pomocí
-nástrojů ekosystému Python, zejména knihovny \textit{pandas} pro tabulkové
-zpracování dat \cite{McKinney2010Pandas}.
+Průzkumná analýza dat slouží k počátečnímu porozumění datové sadě, odhalení odlehlých hodnot, chybějících hodnot, tvaru rozdělení proměnných a základních vztahů mezi nimi~\cite{Tukey1977EDA}. Byla provedena pomocí nástrojů Python, zejména knihovny \textit{pandas} pro tabulkové zpracování dat~\cite{McKinney2010Pandas}.
 
-Pro rychlou prvotní kontrolu datasetu byla dále využita automatizovaná
-profilovací zpráva vytvořená knihovnou \verb|ydata_profiling| \cite{YdataProfiling}. Tento nástroj
-shrnuje rozložení proměnných, korelace, chybějící hodnoty a základní
-statistické charakteristiky jednotlivých atributů datasetu.
+Pro rychlou prvotní kontrolu datasetu byla dále využita automatizovaná profilovací zpráva vytvořená knihovnou \verb|ydata_profiling| \cite{YdataProfiling}. Tento nástroj shrnuje rozložení proměnných, korelace, chybějící hodnoty a základní statistické charakteristiky jednotlivých atributů datasetu.
 
-Další analýza a rozhodnutí o předzpracování byla vedena zjištěními z tohoto reportu. Report zejména pomohl identifikovat potenciální problémy s kvalitou dat, odhalit redundantní proměnné a zvýraznit vztahy mezi jednotlivými atributy.
+Další analýza a rozhodnutí o předzpracování byla vedena zjištěními z tohoto reportu. Report zejména pomohl identifikovat potenciální problémy s~kvalitou dat a zvýraznit vztahy mezi jednotlivými atributy.
 Profilovací zpráva obsahovala:
 \begin{itemize}
 \item Popisné statistiky pro numerické proměnné (průměr, medián, směrodatná odchylka, min, max),
@@ -448,30 +436,32 @@ Dataset obsahuje cílovou proměnnou \textbf{Price Total} a devět deskriptivní
 
 Pro každou proměnnou byly vypočteny tyto deskriptivní míry: průměr, směrodatná odchylka, minimum, 25\% kvantil, 50\% kvantil (medián), 75\% kvantil a maximum. Tyto statistiky poskytují přehled o distribuci, rozptylu a rozsahu proměnných.
 
-\textbf{Cílová proměnná, Price Total,} je vyjádřena v českých korunách (CZK) a představuje uvedenou nabídkovou cenu. Hodnoty se pohybují od 578\,314~CZK do 67\,966\,260~CZK. Distribuce je výrazně pravostranně zkosená, což se projeví v tom, že aritmetický průměr (7 844 760~CZK) významně převyšuje medián (6\,550\,000~CZK) (viz obr. \ref{fig:prices_hist}).
+\textbf{Cílová proměnná, Price Total,} je vyjádřena v českých korunách (Kč) a je nabídkovou cenou uvedenou v inzerátu. Hodnoty se pohybují od 578\,314~Kč do 67\,966\,260~Kč. Distribuce je výrazně pravostranně zkosená, což se projeví v tom, že aritmetický průměr (7 844 760~Kč) významně převyšuje medián (6\,550\,000~Kč) (viz obr. \ref{fig:prices_hist}).
 
-Tato šikmost je typická pro realitní trhy, kde malé procento luxusních nemovitostí  posouvá průměr výš a vytváří dlouhý pravý ocas. V případě kladné šikmosti obecně platí vztah \uv{průměr > medián > modus}. Přibližně 80 \% nemovitostí je soustředěno v cenovém pásmu 2,75M až 14,00M CZK, které lze považovat za \uv{jádro} trhu.
+Tato šikmost je typická pro realitní trhy, kde malé procento luxusních nemovitostí posouvá průměr výš a vytváří dlouhý pravý ocas. V případě kladné šikmosti obecně platí vztah \uv{průměr > medián > modus}. Přibližně 80 \% nemovitostí je soustředěno v cenovém pásmu 2,75M až 14,00M Kč, které lze považovat za \uv{jádro} trhu.
 
-Distribuce \textbf{Usable Area} (užitná plocha) a \textbf{Total Area} (celková plocha) vykazuje výrazné pravostranné zešikmení (skewness $\approx 3.0$), což naznačuje vysokou koncentraci trhu na menších standardních jednotkách. Cca 85{,}4 \% inzerátů má užitnou plochu pod 100~$m^2$ a přibližně 21{,}5 \% odpovídá jednotkám menším než 50~$m^2$.
+Distribuce \textbf{Usable Area} (užitná plocha) a \textbf{Total Area} (celková plocha) vykazuje výrazné pravostranné zešikmení (skewness $\approx 3{,}0$), což naznačuje vysokou koncentraci trhu na menších standardních jednotkách. Přibližně 85{,}4 \% inzerátů má užitnou plochu pod 100~$\mathrm{m}^2$ a přibližně 21{,}5 \% odpovídá jednotkám menším než 50~$\mathrm{m}^2$.
 
-Dále vztah mezi užitnou plochou a cenou vykazuje heteroskedasticitu - s růstem plochy se zvyšuje cena, ale i rozptyl celkových cen. Tento jev naznačuje, že u větších jednotek má větší váhu další vybavenost, jako jsou moderní konstrukce nebo lokalita, než samotná velikost.
+Dále vztah mezi užitnou plochou a cenou vykazuje heteroskedasticitu -- s růstem plochy se zvyšuje cena, ale i rozptyl celkových cen. Tento jev naznačuje, že u větších jednotek má větší váhu další vybavenost, jako jsou moderní konstrukce nebo lokalita, než samotná velikost.
 Vzhledem k nelineární povaze vztahu cena–plocha a přítomnosti extrémních odlehlých hodnot je lepší použít logaritmickou transformaci obou proměnných pro následné modelování, aby se linearizoval vztah a snížil vliv odlehlých pozorování (viz obr. \ref{fig:price_area}).
 
-\textbf{Construction year} (rok výstavby) se pohybuje od 1810 do 2028. Medián je rok 2019, převyšuje průměr 2002, což indikuje, že dataset je zkreslen směrem k moderním výstavbám a projektům vznikajícím v budoucnu. Vyšší hodnoty zde znamenají novější budovy. Novější objekty mají obecně vyšší ceny díky moderním standardům výstavby a lepší energetické náročnosti. Tento vztah je podpořen hodnotou Spearmanova pořadového korelačního koeficientu 0{,}5315, která ukazuje pozitivní asociaci mezi rokem výstavby a mediánovou cenou za metr čtvereční.
+\textbf{Construction year} (rok výstavby) se pohybuje od 1810 do 2028. Medián je rok 2019, převyšuje průměr 2002, což indikuje, že dataset je zkreslen směrem k moderním výstavbám a projektům vznikajícím v budoucnu. Vyšší hodnoty zde znamenají novější budovy. Novější objekty mají obecně vyšší ceny díky moderním standardům výstavby a lepší energetické náročnosti. Tento vztah je silně podpořen hodnotou Spearmanova pořadového korelačního koeficientu ($\rho = 0{,}5315$, $p = 0{,}0010$), která ukazuje statisticky významnou pozitivní asociaci mezi rokem výstavby a mediánovou cenou za metr čtvereční.
+
+Je však třeba upozornit, že rok výstavby vykazuje nejvyšší podíl chybějících hodnot ze všech numerických atributů (pouze $26{,}3\,\%$ záznamů má tuto hodnotu vyplněnu). Tato neúplnost pravděpodobně není náhodná --- novější developerské projekty rok výstavby inzerují systematicky, zatímco u~starší zástavby bývá často vynechán. Imputace mediánem (2019) proto může u~části starších bytů uměle posouvat signál směrem k~novější výstavbě, což částečně vysvětluje nízkou důležitost tohoto příznaku ve výsledném modelu.
 
 Proměnná \textbf{Floor Number} (patro) se pohybuje od 1 do 21, s mediánem 3 a průměrem 3,13. Vyšší podlaží přitom může mít pozitivní vliv na cenu bytu, zejména v budovách s velkým počtem pater \textbf{Total Floors}, kde bývá spojeno s lepším výhledem a nižší mírou hluku.
-Analýza odhalila výrazné \uv{snížení ceny u přízemních jednotek}. Nemovitosti umístěné v prvním patře vykazují mediánovou cenu za metr čtvereční přibližně o 13 \% nižší než jednotky ve vyšších patrech. Toto snížení je běžným tržním fenoménem a odráží preference kupujících ohledně soukromí, bezpečnosti a nižšího hluku pro byty ve vyšších patrech. 
-Spearmanův korelační koeficient mezi podlažím a mediánovou cenou za metr čtvereční je pozitivní (0{,}5684), což naznačuje kladný vztah (viz obr. \ref{fig:floor_price}).
+Analýza odhalila statisticky významné \uv{snížení ceny u~přízemních jednotek} (Welchův t-test na~logaritmované ceně~za~$\mathrm{m}^2$, $t = -9{,}11$, $p < 0{,}001$). Nemovitosti umístěné v~prvním patře vykazují mediánovou cenu za metr čtvereční přibližně o~13~\% nižší než jednotky ve vyšších patrech. Toto snížení je běžným tržním fenoménem a odráží preference kupujících ohledně soukromí, bezpečnosti a nižšího hluku pro byty ve vyšších patrech. 
+Spearmanův korelační koeficient mezi podlažím a mediánovou cenou za metr čtvereční je pozitivní a statisticky významný ($\rho = 0{,}5684$, $p = 0{,}0111$), což poskytuje statistickou evidenci proti nulové hypotéze o~nezávislosti a~podporuje závěr o~kladném vztahu (viz obr.~\ref{fig:floor_price}).
 
-Doplňkové plochy \textbf{Loggia Area} (výměra lodžie) a \textbf{Cellar Area} (výměra sklepu) mají medián 0~$m^2$, což znamená, že více než 50 \% inzerátů tyto prvky nemá. Průměrné hodnoty (0.79~$m^2$ a 1.67~$m^2$) jsou vyšší kvůli podmnožině nemovitostí s významně většími doplňkovými plochami. Očekává se, že tyto proměnné budou mít mírně pozitivní vliv na \textbf{Price Total}.
+Doplňkové plochy \textbf{Loggia Area} (výměra lodžie) a \textbf{Cellar Area} (výměra sklepu) mají medián 0~$\mathrm{m}^2$, což znamená, že více než 50 \% inzerátů tyto prvky nemá. Průměrné hodnoty (0{,}79~$\mathrm{m}^2$ a 1{,}67~$\mathrm{m}^2$) jsou vyšší kvůli podmnožině nemovitostí s významně většími doplňkovými plochami. Očekává se, že tyto proměnné budou mít mírně pozitivní vliv na \textbf{Price Total}.
 
-Je třeba rozlišit mezi binární indikací přítomnosti těchto vybavení a tím, zda jsou jejich rozměry zaznamenány. Například cca 59.3 \% inzerátů uvádí přítomnost sklepa, ale pouze 34.4 \% má uvedenou konkrétní \textbf{Cellar Area}. To naznačuje, že ačkoli jsou tyto prostory v nabídkách časté, jejich výměra není vždy systematicky uváděna. Důvodem přitom nemusí být pouze nižší informační význam z pohledu prodávajících, ale také skutečnost, že internetové inzertní platformy fungují z velké části jako agregátor nabídek z různých primárních zdrojů, které tyto údaje nemusejí vždy poskytovat.
+Je třeba rozlišit mezi binární indikací přítomnosti těchto vybavení a tím, zda jsou jejich rozměry zaznamenány. Například přibližně 59{,}3 \% inzerátů uvádí přítomnost sklepa, ale pouze 34{,}4 \% má uvedenou konkrétní \textbf{Cellar Area}. To naznačuje, že ačkoli jsou tyto prostory v nabídkách časté, jejich výměra není vždy systematicky uváděna. Důvodem přitom nemusí být pouze nižší informační význam z pohledu prodávajících, ale také skutečnost, že internetové inzertní platformy fungují z velké části jako agregátor nabídek z různých primárních zdrojů, které tyto údaje nemusejí vždy poskytovat.
 
-Samotná přítomnost lodžie v datech nevykazuje kladnou cenovou prémii. Mediánová cena za metr čtvereční je u bytů s lodžií přibližně o 2.5 \% nižší než u bytů bez lodžie, což odpovídá i záporné korelaci uvedené níže. Tento vztah proto nelze interpretovat jako přímý negativní efekt lodžie, ale spíše jako důsledek toho, že lodžie jsou častější v levnějších segmentech, například ve starší panelové zástavbě.
+Samotná přítomnost lodžie v datech nevykazuje kladnou cenovou prémii. Mediánová cena za metr čtvereční je u bytů s lodžií přibližně o 2{,}5~\% nižší než u bytů bez lodžie (Welchův t-test na~logaritmované ceně~za~$\mathrm{m}^2$, $t = -4{,}74$, $p < 0{,}001$). Tento vztah proto nelze interpretovat jako přímý negativní efekt lodžie, ale spíše jako důsledek toho, že lodžie jsou častější v levnějších segmentech, například ve starší panelové zástavbě.
 
-Dataset obsahuje přesné geografické identifikátory ve formě \textbf{Latitude} a \textbf{Longitude}. Pozorování spadají do územních hranic České republiky (Lat: 48.60 až 51.00; Lon: 12.17 až 18.77), což potvrzuje geografickou konzistenci. Distribuce však není rovnoměrná - výrazná prostorová koncentrace je v hlavních městských centrech: cca 32.2 \% inzerátů připadá na Prahu a největší okresní segment odpovídá přibližně 7.1 \% záznamů.
+Dataset obsahuje přesné geografické identifikátory ve formě \textbf{Latitude} a \textbf{Longitude}. Pozorování spadají do územních hranic České republiky (Lat: 48{,}60 až 51{,}00; Lon: 12{,}17 až 18{,}77), což potvrzuje geografickou konzistenci. Distribuce však není rovnoměrná -- výrazná prostorová koncentrace je v hlavních městských centrech: přibližně 32{,}2 \% inzerátů připadá na Prahu a největší okresní segment odpovídá přibližně 7{,}1 \% záznamů.
 
-Zahrnutí geografických souřadnic představuje klíčový prvek analýzy, neboť umožňuje lépe zachytit prostorovou závislost mezi pozorováními. Souřadnice slouží i jako primární klíč pro budoucí doplnění informací o bodech zájmu (POI). Výpočet vzdáleností od veřejné dopravy, zelených ploch nebo obchodních center pomůže modelu zachytit lokální prémiové efekty, které nejsou plně vysvětleny strukturálními atributy.
+Zahrnutí geografických souřadnic je důležité pro analýzu, neboť lépe zachycuje prostorovou závislost mezi pozorováními. Souřadnice slouží i jako primární klíč pro budoucí doplnění informací o bodech zájmu (POI). Výpočet vzdáleností od veřejné dopravy, zelených ploch nebo obchodních center pomůže modelu zachytit lokální prémiové efekty, které nejsou plně vysvětleny strukturálními atributy.
 \begin{table}[ht]
 \centering
 \caption{Deskriptivní statistiky numerických proměnných v datasetu nemovitostí.}
@@ -481,13 +471,13 @@ Zahrnutí geografických souřadnic představuje klíčový prvek analýzy, nebo
 \toprule
 Proměnná & Počet & Průměr & Sm. odch. & Min & 25\,\% & 50\,\% & 75\,\% & Max \\
 \midrule
-\text{price\_total} (K\v{c}) & 11\,235 & 7\,844\,760 & 5\,406\,630 & 578\,314 & 4\,199\,500 & 6\,545\,000 & 9\,590\,000 & 67\,966\,260 \\
-\text{latitude} & 11\,235 & 49{,}91 & 0{,}49 & 48{,}60 & 49{,}61 & 50{,}05 & 50{,}13 & 51{,}00 \\
-\text{longitude} & 11\,235 & 15{,}09 & 1{,}41 & 12{,}17 & 14{,}36 & 14{,}51 & 16{,}16 & 18{,}77 \\
-\text{usable\_area\_m2} ($\text{m}^2$) & 11\,235 & 72{,}35 & 33{,}31 & 11 & 51 & 67 & 84 & 340 \\
-\text{total\_area\_m2} ($\text{m}^2$) & 11\,235 & 75{,}78 & 38{,}32 & 3 & 53 & 68 & 88 & 497 \\
+\text{price\_total} (K\v{c}) & 11\,258 & 7\,844\,760 & 5\,406\,630 & 578\,314 & 4\,199\,500 & 6\,545\,000 & 9\,590\,000 & 67\,966\,260 \\
+\text{latitude} & 11\,258 & 49{,}91 & 0{,}49 & 48{,}60 & 49{,}61 & 50{,}05 & 50{,}13 & 51{,}00 \\
+\text{longitude} & 11\,258 & 15{,}09 & 1{,}41 & 12{,}17 & 14{,}36 & 14{,}51 & 16{,}16 & 18{,}77 \\
+\text{usable\_area\_m2} ($\text{m}^2$) & 11\,258 & 72{,}35 & 33{,}31 & 11 & 51 & 67 & 84 & 340 \\
+\text{total\_area\_m2} ($\text{m}^2$) & 11\,258 & 75{,}78 & 38{,}32 & 3 & 53 & 68 & 88 & 497 \\
 \text{loggia\_area\_m2} ($\text{m}^2$) & 10\,578 & 0{,}85 & 2{,}80 & 0 & 0 & 0 & 0 & 103 \\
-\text{cellar\_area\_m2} ($\text{m}^2$) & 11\,235 & 1{,}66 & 4{,}00 & 0 & 0 & 0 & 2 & 106 \\
+\text{cellar\_area\_m2} ($\text{m}^2$) & 11\,258 & 1{,}66 & 4{,}00 & 0 & 0 & 0 & 2 & 106 \\
 \text{floor\_number} & 11\,202 & 3{,}13 & 2{,}22 & 1 & 2 & 3 & 4 & 21 \\
 \text{total\_floors} & 8\,373 & 5{,}37 & 2{,}95 & 1 & 3 & 5 & 7 & 51 \\
 \text{construction\_year} & 2\,964 & 2001{,}84 & 31{,}94 & 1810 & 1980 & 2019 & 2025 & 2028 \\
@@ -498,7 +488,7 @@ Proměnná & Počet & Průměr & Sm. odch. & Min & 25\,\% & 50\,\% & 75\,\% & Ma
 \begin{figure}[htbp]
 \centering
     \includegraphics[width=1\linewidth]{images/price_hist.png}
-    \caption{Histogram rozložení cen bytů, měřené v milionech českých korun (CZK), vykazuje výrazné pravostranné vychýlení.}
+    \caption{Histogram rozložení cen bytů, měřené v milionech českých korun (Kč), vykazuje výrazné pravostranné vychýlení.}
     \label{fig:prices_hist}
 \end{figure}
 
@@ -520,7 +510,7 @@ Proměnná & Počet & Průměr & Sm. odch. & Min & 25\,\% & 50\,\% & 75\,\% & Ma
 \begin{figure}[htbp]
 \centering
     \includegraphics[width=1\linewidth]{images/floor_price.png}
-    \caption{Houslové grafy ceny za $m^2$ napříč patry 1–14 (vyloučeny 0.1\% extrémní hodnoty). Červená čára indikuje pozitivní korelaci mezi úrovní podlaží a mediánovou cenou jednotky.}
+    \caption{Houslové grafy ceny za $\mathrm{m}^2$ napříč patry 1–14 (vyloučeny 0{,}1\,\% extrémní hodnoty). Červená čára indikuje pozitivní korelaci mezi úrovní podlaží a mediánovou cenou jednotky.}
     \label{fig:floor_price}
 \end{figure}
 \clearpage{}
@@ -529,29 +519,29 @@ Proměnná & Počet & Průměr & Sm. odch. & Min & 25\,\% & 50\,\% & 75\,\% & Ma
 \label{subsec:qualitative_variables}
 Tato sekce se zaměřuje na kvalitativní proměnné zahrnuté do analýzy. Z původního datasetu bylo vybráno celkem 18 kategoriálních a binárních proměnných. Kvalitativní proměnné zahrnují dispozici bytu, lokalizační proměnné na úrovni kraje, okresu a obce, konstrukční atributy jako  \textbf{Construction type}, \textbf{Building condition} a  \textbf{Ownership type}, stejně jako \textbf{Energy class} (distribuce kategorických proměnných viz obr. \ref{fig:cat_counts}). Dále několik binárních indikátorů reprezentuje přítomnost garáže, výtahu, terasy či podobných vybavení.
 
-Frekvenční rozdělení dispozic \textbf{Category sub} bylo analyzováno pro zkoumání struktury trhu. Jak ukazuje obr. \ref{fig:disposition}, trh je dominován dispozicemi \emph{2+kk} a \emph{3+kk}, které představují přibližně 24 \% a 21 \% pozorování.
+Pro zkoumání struktury trhu bylo analyzováno frekvenční rozdělení dispozic. Jak ukazuje obr. \ref{fig:disposition}, trh je dominován dispozicemi \emph{2+kk} a \emph{3+kk}, které představují přibližně 24 \% a 21 \% pozorování.
 
-Po agregaci čtyř nejčastějších kategorií - \emph{2+kk}, \emph{3+kk}, \emph{2+1} a \emph{3+1} - tyto tvoří cca 72.5 \% datasetu, což indikuje vysokou reprezentaci malých a středních bytů. Zbylé segmenty, včetně luxusních 5+ pokojových jednotek, tvoří menší část trhu.
+Po agregaci čtyř nejčastějších kategorií -- \emph{2+kk}, \emph{3+kk}, \emph{2+1} a \emph{3+1} -- tyto tvoří přibližně 72{,}5 \% datasetu, což indikuje vysokou reprezentaci malých a středních bytů. Zbylé segmenty, včetně luxusních 5+ pokojových jednotek, tvoří menší část trhu.
 
-Existuje pravděpodobně kladná korelace mezi dispozicí a \textbf{Price Total}, Spearmanův koeficient dosáhl hodnoty 0{,}378 (viz obr. \ref{fig:disposition_price}), avšak rozptyl cen se s rostoucí dispozicí významně zvětšuje kvůli malému počtu dat a širokému spektru doplňkových prémiových atributů.
+Existuje statisticky významná kladná korelace mezi dispozicí a cílovou proměnnou, přičemž Spearmanův koeficient dosáhl hodnoty $\rho = 0{,}378$ ($p < 0{,}0001$, viz obr.~\ref{fig:disposition_price}), avšak rozptyl cen se s rostoucí dispozicí významně zvětšuje kvůli menšímu počtu pozorování ve vyšších kategoriích dispozic a širokému spektru doplňkových prémiových atributů.
 
-S ohledem na konstrukční charakteristiky drží dominantní podíl materiál \emph{Cihlová} přibližně 56.4  \%, zatímco \emph{Panelová} tvoří menší, ale významný segment s podílem přibližně 20.3 \%.
+Mezi konstrukčními materiály jednoznačně dominuje cihlová zástavba s podílem přibližně 56{,}4 \%, zatímco panelová tvoří menší, ale významný segment (přibližně 20{,}3 \%). 
 
-Jak ukazuje obr. \ref{fig:construction_analysis}, volba konstrukčního materiálu je jedním z determinantů \textbf{Price Total}. Například \emph{Panelová} zástavba bývá cenově dostupnější vzhledem ke své historické vazbě na masivní bytovou výstavbu, zatímco \emph{Cihlová} a moderní \emph{Skeletová} zpravidla vykazují prémii kvalitní výstavby.
+Volba konstrukčního materiálu je jedním z determinantů nabídkové ceny. Například \emph{Panelová} zástavba bývá cenově dostupnější vzhledem ke své historické vazbě na masivní bytovou výstavbu, zatímco \emph{Cihlová} a moderní \emph{Skeletová} zpravidla vykazují prémii kvalitní výstavby.
 
-\textbf{Energetická náročnost} budov je popsána proměnnými \textbf{energy class} a \textbf{Energy efficiency rating}. Nejčastější třída je \emph{G} (3\,303 nemovitostí), následovaná třídou \emph{B} (3\,098 záznamů). Data ukazují přítomnost tzv. \emph{green premium} - nemovitosti s nejlepší energetickou třídou (A a B) dosahují vyšších mediánových cen za ~$m^2$ než objekty v třídě G. Tento jev je v souladu se zahraničními studiemi, které potvrzují pozitivní vliv energetické certifikace na tržní hodnotu nemovitostí \cite{FuerstMcAllister2011}.
+\textbf{Energetická náročnost} budov je popsána proměnnými \textbf{energy class} a \textbf{Energy efficiency rating}. Nejčastější třída je \emph{G} (3\,303 nemovitostí), následovaná třídou \emph{B} (3\,098 záznamů). Data ukazují přítomnost tzv. \emph{green premium}  nemovitosti s~nejlepší energetickou třídou (A~a~B) dosahují vyšších mediánových cen za~$\mathrm{m}^2$ než objekty v~třídě~G. Tento rozdíl je statisticky i~věcně významný --- mediánová cena za~$\mathrm{m}^2$ je u~tříd A~a~B přibližně o~30\,\% vyšší než u~třídy~G (Welchův t-test na~logaritmované ceně za~$\mathrm{m}^2$, $t = 41{,}58$, $p < 0{,}001$) --- a~je v~souladu se zahraničními studiemi, které potvrzují pozitivní vliv energetické certifikace na tržní hodnotu nemovitostí~\cite{FuerstMcAllister2011}.
 
 Zhruba polovina nemovitostí ve třídách A a B je zároveň označena jako \emph{Novostavba}. Naopak třída G je převážně složena ze starších budov, což může z části odrážet i neaktuálnost energetických posudků.
 
 \paragraph{Stav budovy a vlastnictví}
-Nejčastěji zastoupenou kategorií stavebního stavu budovy je \textit{Velmi dobrý}, zatímco kategorie \textit{Špatný} se vyskytuje pouze výjimečně. V trénovacích datech je zastoupena jen dvěma pozorováními, což neumožňuje spolehlivý statistický odhad pro tuto skupinu. Z tohoto důvodu je vhodné tuto kategorii sloučit s kategorií \textit{Před rekonstrukcí}. Vlastnická struktura je v datasetu převážně \emph{Osobní} (cca 90 \%). Byty v družstevním nebo státním vlastnictví současně mohou vykazovat nižší cenovou úroveň, což může souviset jak s právní formou vlastnictví, tak s odlišnou strukturou a kvalitou těchto nemovitostí.
+Nejčastěji zastoupenou kategorií stavebního stavu budovy je \textit{Velmi dobrý}, zatímco kategorie \textit{Špatný} se vyskytuje pouze výjimečně. V trénovacích datech je zastoupena jen dvěma pozorováními, což neumožňuje spolehlivý statistický odhad pro tuto skupinu. Z tohoto důvodu je vhodné tuto kategorii sloučit s kategorií \textit{Před rekonstrukcí}. Vlastnická struktura je v~datasetu převážně \emph{Osobní} (přibližně~90~\%). Byty v~družstevním nebo státním vlastnictví vykazují nižší cenovou úroveň -- tento rozdíl je statisticky významný (Welchův t-test na~logaritmované ceně za~$\mathrm{m}^2$, $t = 29{,}03$, $p < 0{,}001$), což může souviset jak s~právní formou vlastnictví, tak s~odlišnou strukturou a~kvalitou těchto nemovitostí.
 
 \subsubsection*{Extra prostory a vybavení}
-Dataset obsahuje několik binárních proměnných zachycujících přítomnost vybraného vybavení. Přibližně 45.3 \% budov má výtah (\textbf{has elevator}). Lodžie (\textbf{has loggia}) se vyskytuje v ~18 \% případů, terasa (\textbf{has terrace}) v ~19 \%.
+Dataset obsahuje několik binárních proměnných zachycujících přítomnost vybraného vybavení. Přibližně 45{,}3 \% budov má výtah (\textbf{has elevator}). Lodžie (\textbf{has loggia}) se vyskytuje v~18\% případů, terasa (\textbf{has terrace}) v~19\%.
 
-Co se týče sklepení a parkovacích možností, cca 59.1 \% nemovitostí zahrnuje sklep (\textbf{has cellar}) a 13.2 \% inzerátů nabízí garáž (\textbf{has garage}). Tato vybavení obvykle zvyšují užitnost a mohou mít pozitivní vliv na \textbf{Price Total} (viz tab. \ref{tab:amenity_correlation}).
+Co se týče sklepení a parkovacích možností, přibližně 59{,}1 \% nemovitostí zahrnuje sklep (\textbf{has cellar}) a 13{,}2 \% inzerátů nabízí garáž (\textbf{has garage}). Tato vybavení obvykle zvyšují užitnost a mohou mít pozitivní vliv na cílovou proměnnou (viz tab. \ref{tab:amenity_correlation}).
 
-Zajímavým zjištěním je záporná korelace \textbf{has loggia} s cenou. To neznamená, že lodžie sama o sobě snižuje cenu; spíše indikuje, že lodžie jsou častější v starších panelových domech, které patří k levnějším segmentům trhu.
+Zajímavým zjištěním je záporná korelace přitomné lodžie s cenou. To neznamená, že lodžie sama o sobě snižuje cenu; spíše indikuje, že lodžie jsou častější v starších panelových domech, které patří k levnějším segmentům trhu.
 
 \begin{table}[h]
 \caption{Korelace mezi vybraným vybavením a cílovou proměnnou.}
@@ -571,26 +561,26 @@ has\_loggia   & -0.042618 & 6.082827e-06 \\
 \label{tab:amenity_correlation}
 \end{table}
 
-K analýze vybavenosti nemovitostí byla využita proměnná \textbf{is furnished}. Nejvíce zastoupenou kategorii tvořily nezařízené objekty (kódováno jako False) s celkovým počtem 2 278 pozorování. Těsně následovaly částečně zařízené nemovitosti (kategorie Částečně) čítající 2 254 záznamů, přičemž plně vybavených bytů bylo identifikováno 1 181. Následná cenová analýza prokázala, že plně zařízené bytové jednotky vykazují v průměru o 8 \% vyšší nabídkovou cenu ve srovnání s jednotkami nezařízenými.
+K analýze vybavenosti nemovitostí byla využita proměnná \textbf{is furnished}. Nejvíce zastoupenou kategorii tvořily nezařízené objekty (kódováno jako False) s celkovým počtem 2 278 pozorování. Těsně následovaly částečně zařízené nemovitosti (kategorie Částečně) čítající 2 254 záznamů, přičemž plně vybavených bytů bylo identifikováno 1 181. Následná cenová analýza ukázala, že plně zařízené bytové jednotky vykazují v~průměru o~8~\% vyšší nabídkovou cenu ve srovnání s~jednotkami nezařízenými. Welchův t-test na~logaritmované ceně zamítá nulovou hypotézu o~shodě středních hodnot na hladině významnosti $\alpha = 0{,}05$ ($t = 4{,}45$, $p < 0{,}001$).
 
 \subsection{Lokalita a občanská vybavenost}
 
-Proměnné identifikující okres (\texttt{district id}) a kraj (\texttt{locality region id}) představují klíčové vstupy pro uvažované modely. Jak ilustruje grafické znázornění distribuce cen (viz Obr. \ref{fig:price_region}), realitní trh se vyznačuje značnými regionálními disparitami. Dominantním prvkem je zjevná asymetrie mezi Hlavním městem Prahou, kde se mediánové ceny pohybují na dvojnásobku oproti ostatním krajům. 
+Proměnné identifikující okres (\texttt{district id}) a kraj (\texttt{locality region id}) jsou důležitými vstupy pro uvažované modely. Jak ilustruje grafické znázornění distribuce cen (viz Obr. \ref{fig:price_region}), realitní trh se vyznačuje značnými regionálními disparitami. Dominantním prvkem je zjevná asymetrie mezi Hlavním městem Prahou a ostatními kraji -- mediánové ceny v Praze dosahují přibližně dvojnásobku cen v ostatních krajích. 
 Pro detailnější prostorový kontext byla využita data o~bodech zájmu (POI), jejichž zdroje a struktura jsou popsány v~sekci~\ref{sec:data_sources}.
 
 
 \section{POI feature engineering}\label{sec:poi_feature_engineering}
 
-Výběr nejrelevantnějších prostorových proměnných z původní sady 22 kandidátních POI příznaků byl proveden metodou dopředného výběru (Forward Feature Selection). Jako optimalizační kritérium byla zvolena maximalizace Spearmanova korelačního koeficientu \(\rho\) s cílovou proměnnou (nabídkovou cenou). V každém kroku byl do modelu přidán ten příznak, který přinesl největší marginální zvýšení absolutní hodnoty korelace. Proces byl iterativně opakován a zastaven v momentě, kdy přidání další prostorové proměnné nezvýšilo korelaci o více než stanovenou prahovou hodnotu. Výsledkem je kompaktní sada 5 nejvýznamnějších příznaků, jejichž technický výpočet je popsán níže.
+Pro identifikaci nejrelevantnějších prostorových proměnných byla nejprve provedena explorační analýza pomocí dopředného výběru (Forward Feature Selection) s cílem maximalizace Spearmanova korelačního koeficientu \(\rho\) vůči nabídkové ceně. Souběžně byla testována sada předdefinovaných skupin POI příznaků (doprava, maloobchod, centrum města, všechny kombinace). Z~tohoto srovnání vzešla jako slibná základní varianta se třemi hlavními příznaky (kvalita dopravní obslužnosti, vzdálenost k nejbližšímu obchodnímu domu, počet obchodů v~okruhu 2~km). Následný podrobnější dopředný výběr příznaků (\textit{forward feature selection}) identifikoval optimalizovanou sadu 5 příznaků (viz tab.~\ref{tab:poi_correlation}), která přinesla dodatečné zlepšení predikční přesnosti a byla proto použita pro finální model (viz kap.~\ref{chap:implementation}).
 
-Veškeré vzdálenosti jsou počítány jako ortodromická vzdálenost (vzdušnou čarou) s využitím Haversinova vzorce, přičemž poloměr Země je stanoven na \(R = 6371{,}0088\) km.
+Veškeré vzdálenosti jsou počítány jako ortodromická vzdálenost (vzdušnou čarou) s využitím Haversinova vzorce~\cite{Sinnott1984Haversine}, přičemž poloměr Země je stanoven na \(R = 6371{,}0088\) km.
 
 \begin{equation}
 d = 2R \cdot \arcsin\!\left(\sqrt{\sin^2\!\left(\frac{\Delta\varphi}{2}\right) + \cos\varphi_1 \cos\varphi_2 \sin^2\!\left(\frac{\Delta\lambda}{2}\right)}\right),
 \end{equation}
 kde \(d\) je ortodromická vzdálenost v~kilometrech, \(R = 6371{,}0088\)~km je poloměr Země, \(\varphi_1, \varphi_2\) jsou zeměpisné šířky obou bodů a \(\Delta\varphi = \varphi_2 - \varphi_1\), \(\Delta\lambda\) je rozdíl jejich zeměpisných délek (vše v~radiánech).
 
-Výpočetní implementace využívá datovou strukturu BallTree z knihovny scikit-learn s metrikou \texttt{haversine}. Souřadnice bodů zájmu jsou nejprve převedeny do radiánů a následně indexovány do stromové struktury. Tento postup umožňuje efektivní dotazování na nejbližší sousedy (\(k\)-NN) i vyhledávání v definovaném poloměru (radius queries).
+Výpočetní implementace využívá datovou strukturu BallTree z knihovny scikit-learn s metrikou \texttt{haversine}. Souřadnice bodů zájmu jsou nejprve převedeny do radiánů a následně indexovány do stromové struktury. Tento postup umožňuje efektivně dotazovat nejbližší sousedy (\(k\)-NN) i vyhledávání v definovaném poloměru (radius queries).
 
 Pro optimalizaci experimentálních výpočtů je struktura BallTree inicializována pouze jednou a následně uchovávána v mezipaměti.
 
@@ -599,34 +589,34 @@ Pro optimalizaci experimentálních výpočtů je struktura BallTree inicializov
 Pro každou nemovitost jsou vyčísleny následující metriky:
 
 \begin{itemize}
-    \item \texttt{transport\_nearest\_km} - vzdálenost k nejbližšímu dopravnímu uzlu bez ohledu na typ.
-    \item \texttt{transport\_count\_within\_500m} - počet dopravních uzlů v okruhu do 500 metrů.
-    \item \texttt{transport\_count\_within\_1000m} - počet dopravních uzlů v okruhu do 1 kilometru.
-    \item \texttt{metro\_train\_nearest\_km} - vzdálenost k nejbližší stanici metra nebo železnice, přičemž je aplikován filtr na kategorie \emph{metro}, \emph{train\_station} a \emph{train\_stop}.
+    \item \texttt{transport nearest km} -- vzdálenost k nejbližšímu dopravnímu uzlu bez ohledu na typ.
+    \item \texttt{transport count within 500m} -- počet dopravních uzlů v okruhu do 500 metrů.
+    \item \texttt{transport count within 1000m} -- počet dopravních uzlů v okruhu do 1 kilometru.
+    \item \texttt{metro train nearest km} -- vzdálenost k nejbližší stanici metra nebo železnice, přičemž je aplikován filtr na kategorie \emph{metro}, \emph{train station} a \emph{train stop}.
 \end{itemize}
 
 Tyto proměnné kvantifikují jak lokální dostupnost městské hromadné dopravy, tak i návaznost na páteřní dopravní infrastrukturu, zejména metro a železnici.
 
 \paragraph{Rozdělení obchodů na supermarkety a samoobsluhy}
 
-Základní proměnné nerozlišovaly mezi jednotlivými formáty maloobchodních prodejen. Rozklad podle atributu \texttt{poi\_kind} umožnil vytvořit samostatné proměnné pro jednotlivé typy obchodů. Forward selection vybral dva z nich:
+Základní proměnné nerozlišovaly mezi jednotlivými formáty maloobchodních prodejen. Rozklad podle atributu \texttt{poi kind} umožnil vytvořit samostatné proměnné pro jednotlivé typy obchodů. Forward selection vybral dva z nich:
 
 \begin{itemize}
-    \item \texttt{supermarket\_nearest\_km} - vzdálenost k nejbližšímu supermarketu.
-    \item \texttt{convenience\_nearest\_km} - vzdálenost k nejbližší samoobsluze.
+    \item \texttt{supermarket nearest km} -- vzdálenost k nejbližšímu supermarketu.
+    \item \texttt{convenience nearest km} -- vzdálenost k nejbližší samoobsluze.
 \end{itemize}
 
-Tento výběr potvrzuje hypotézu, že typ prodejny má diferencovaný vliv na ocenění. Zatímco blízkost supermarketu je indikátorem kvalitní občanské vybavenosti, dostupnost samoobsluhy sama o sobě nepřináší cenovou prémii. Proměnná \texttt{supermarket\_nearest\_km} vykazuje slabší korelaci (\(\rho = -0.1268\)) než \texttt{convenience\_nearest\_km} (\(\rho = -0.2589\)), což odráží odlišné lokalizační vzorce obou typů prodejen.
+Tento výběr potvrzuje hypotézu, že typ prodejny ovlivňuje ocenění odlišným způsobem. Zatímco blízkost supermarketu je indikátorem kvalitní občanské vybavenosti, dostupnost samoobsluhy sama o sobě nepřináší cenovou prémii. Proměnná \texttt{supermarket nearest km} vykazuje slabší korelaci (\(\rho = -0.1268\)) než \texttt{convenience nearest km} (\(\rho = -0.2589\)), což odráží odlišné lokalizační vzorce obou typů prodejen.
 
 \paragraph{Průměrná vzdálenost ke třem nejbližším obchodům (KNN)}
 
-Standardní metrika \texttt{nearest\_km} zachycuje pouze absolutně nejbližší bod. Forward selection identifikoval průměrnou vzdálenost ke třem nejbližším obchodům jako informativnější metriku koncentrace služeb:
+Standardní metrika \texttt{nearest km} zachycuje pouze absolutně nejbližší bod. Forward selection identifikoval průměrnou vzdálenost ke třem nejbližším obchodům jako informativnější metriku koncentrace služeb:
 
 \begin{itemize}
-    \item \texttt{grocery\_avg\_3\_nearest\_km} - průměrná vzdálenost ke třem nejbližším obchodům.
+    \item \texttt{grocery avg 3 nearest km} -- průměrná vzdálenost ke třem nejbližším obchodům.
 \end{itemize}
 
-Tato proměnná vykazuje Spearmanovu korelaci \(\rho = -0.2256\), tedy vyšší než samotná \texttt{grocery\_nearest\_km} (\(\rho = -0.1724\)).
+Tato proměnná vykazuje Spearmanovu korelaci \(\rho = -0.2256\), tedy vyšší než samotná \texttt{grocery nearest km} (\(\rho = -0.1724\)).
 
 \paragraph{Skóre kvality dopravy}
 
@@ -639,7 +629,7 @@ Q_{\text{doprava}} = \frac{w_{\text{metro}}}{1 + d_{\text{metro}}} + \frac{w_{\t
 kde \(d\) představuje vzdálenost v kilometrech. Vyšší hodnota indikuje lepší dopravní obslužnost. Váhy jednotlivých druhů dopravy byly spočteny na~trénovací množině na~základě maximalizace Spearmanova korelačního koeficientu a~činí: \(w_{\text{metro}} = 10\), \(w_{\text{tram}} = 1\) a~\(w_{\text{bus}} = 0\). S korelačním koeficientem \(\rho = +0.6112\) jde o nejsilnější POI příznak.
 \paragraph{Korelace vybraných POI příznaků s cenou}
 
-Pro kvantifikaci vztahu mezi lokalizačními atributy a nabídkovou cenou byl vypočten Spearmanův korelační koeficient. Forward feature selection (viz detailní postup v~sekci~\ref{sec:poi_feature_engineering}) identifikovala z 22 kandidátních POI parametrů pět nejvýznamnějších; jejich korelace s cílovou proměnnou \texttt{price\_total} shrnuje tabulka~\ref{tab:poi_correlation}.
+Pro kvantifikaci vztahu mezi lokalizačními atributy a nabídkovou cenou byl vypočten Spearmanův korelační koeficient. Forward feature selection -- metoda iterativního přidávání příznaků podle největšího marginálního zvýšení absolutní hodnoty korelace, zastavená při poklesu pod stanovenou mez (viz detailní postup v~sekci~\ref{sec:poi_feature_engineering})  identifikovala z~22 kandidátních POI parametrů pět nejvýznamnějších; jejich korelace s~cílovou proměnnou \texttt{price total} shrnuje tabulka~\ref{tab:poi_correlation}.
 
 \begin{table}[h]
 \centering
@@ -649,22 +639,22 @@ Pro kvantifikaci vztahu mezi lokalizačními atributy a nabídkovou cenou byl vy
 \toprule
 Příznak & Spearman $\rho$ \\
 \midrule
-\texttt{transport\_quality\_score}  & $+0.6112$ \\
-\texttt{city\_center\_travel\_time\_min} & $-0.4294$ \\
-\texttt{convenience\_nearest\_km}    & $-0.2589$ \\
-\texttt{grocery\_avg\_3\_nearest\_km} & $-0.2256$ \\
-\texttt{supermarket\_nearest\_km}    & $-0.1268$ \\
+\texttt{transport\_quality\_score}  & $+0{,}6112$ \\
+\texttt{city\_center\_travel\_time\_min} & $-0{,}4294$ \\
+\texttt{convenience\_nearest\_km}    & $-0{,}2589$ \\
+\texttt{grocery\_avg\_3\_nearest\_km} & $-0{,}2256$ \\
+\texttt{supermarket\_nearest\_km}    & $-0{,}1268$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Nejsilnější korelaci s~cenou vykazuje \texttt{transport\_quality\_score} (\(\rho = +0{,}6112\)), což potvrzuje, že kvalita dopravní obslužnosti patří mezi klíčové determinanty nabídkové ceny bytu. Záporná korelace u~\texttt{city\_center\_travel\_time\_min} (\(\rho = -0{,}4294\)) indikuje, že s~rostoucí dobou jízdy do centra krajského města cena klesá — blízkost ekonomického a~administrativního centra regionu je cenovou prémií. Zbývající tři příznaky zachycují dostupnost maloobchodní sítě. \texttt{convenience\_nearest\_km} (\(\rho = -0{,}2589\)) a~\texttt{grocery\_avg\_3\_nearest\_km} (\(\rho = -0{,}2256\)) vykazují slabší negativní vztah, což naznačuje, že blízkost samoobsluh a~vyšší hustota obchodů mírně zvyšují cenu. Nejméně výrazný je vliv \texttt{supermarket\_nearest\_km} (\(\rho = -0{,}1268\)), patrně proto, že supermarkety bývají lokalizovány i~v~periferních oblastech s~nižšími cenami, čímž se jejich korelační signál rozměňuje. Celkově výsledky potvrzují, že prostorové příznaky nesou dodatečnou informaci o~ceně nad rámec základních strukturovaných atributů.
+Nejsilnější korelaci vykazuje \texttt{transport quality score} (\(\rho = +0{,}61\)), což potvrzuje, že kvalita dopravní obslužnosti patří mezi hlavní determinanty nabídkové ceny bytu. Záporná korelace u~\texttt{city center travel time min} (\(\rho = -0{,}4294\)) indikuje, že s~rostoucí dobou jízdy do centra nejbližšího krajského města cena klesá. Zbývající tři příznaky zachycují dostupnost maloobchodní sítě. \texttt{convenience nearest km} (\(\rho = -0{,}2589\)) a~\texttt{grocery avg 3 nearest km} (\(\rho = -0{,}2256\)) vykazují slabší negativní vztah, což naznačuje, že blízkost samoobsluh a~vyšší hustota obchodů mírně zvyšují cenu. Nejméně výrazný je vliv \texttt{supermarket nearest km} (\(\rho = -0{,}1268\)), patrně proto, že supermarkety bývají lokalizovány i~v~periferních oblastech s~nižšími cenami, čímž se jejich vliv na cenu tlumí. Celkově výsledky potvrzují, že prostorové příznaky nesou dodatečnou informaci o~ceně nad rámec základních strukturovaných atributů.
 
 
 
 \begin{figure}[htbp]
 \centering
-    \includegraphics[width=1\linewidth]{images/bar_counts.png}
+    \includegraphics[width=0.92\linewidth]{images/categorical_shares.png}
     \caption{Rozložení tržních podílů různých kategorií}
     \label{fig:cat_counts}
 \end{figure}
@@ -672,36 +662,31 @@ Nejsilnější korelaci s~cenou vykazuje \texttt{transport\_quality\_score} (\(\
 \begin{figure}[htbp]
 \centering
     \includegraphics[width=1\linewidth]{images/disp_o.png}
-    \caption{Distribuce dispozic bytů. Sloupcový graf zvýrazňuje převahu moderních otevřených dispozic (kk) oproti tradičním (+1), s 2+kk a 3+kk jako největšími segmenty}
-    \label{fig:disposition}
+\caption{Distribuce dispozic bytů. Sloupcový graf ukazuje převahu moderních otevřených dispozic (kk) nad tradičními (+1), přičemž největší podíl tvoří kategorie 2+kk a 3+kk.}
+\label{fig:disposition}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
     \includegraphics[width=1\linewidth]{images/room_price.png}
-    \caption{Houslové grafy ceny za $m^2$ rozdělené podle dispozice. Distribuce ukazuje mírný pozitivní monotónní trend ($\rho = 0.378$) s postupným nárůstem mediánu}
+    \caption{Houslové grafy ceny za $\mathrm{m}^2$ rozdělené podle dispozice. Distribuce ukazuje mírný pozitivní monotónní trend ($\rho = 0{,}378$) s postupným nárůstem mediánu}
     \label{fig:disposition_price}
 \end{figure}
 
 \begin{figure}[htbp]
 \centering
     \includegraphics[width=1\linewidth]{images/price_cond.png}
-    \caption{Houslové grafy ceny za $m^2$ podle stavu budovy. Vizualizace ukazuje prémiovou hodnotu novějších staveb a hustotu trhu, kde \emph{Dobrý} a \emph{Velmi dobrý} stav dominují}
+    \caption{Houslové grafy ceny za $\mathrm{m}^2$ podle stavu budovy. Vizualizace ukazuje prémiovou hodnotu novějších staveb a hustotu trhu, kde \emph{Dobrý} a \emph{Velmi dobrý} stav dominují}
     \label{fig:price_cond}
 \end{figure}
 
-\begin{figure}[htbp]
-\centering
-    \includegraphics[width=1\linewidth]{images/construct_price.png}
-    \caption{Houslové grafy ceny za $m^2$ podle typu konstrukce}
-    \label{fig:construction_analysis}
-\end{figure}
+
 
 
 \begin{figure}[htbp]
 \centering
     \includegraphics[width=1\linewidth]{images/region_price_violin.png}
-    \caption{Houslové grafy ceny za $m^2$ podle typu kraje}
+    \caption{Houslové grafy ceny za $\mathrm{m}^2$ podle kraje}
     \label{fig:price_region}
 \end{figure}
 
@@ -714,7 +699,7 @@ Aktuální pipeline předzpracování je rozdělena do dvou navazujících krok�
 
 \begin{itemize}
     \item \textbf{Odstranění nevyužitých atributů:} Z datasetu jsou odstraněny identifikátory, metadata a nestrukturované texty, konkrétně např. \textbf{id}, \textbf{web link}, \textbf{updated}, \textbf{created at}, \textbf{title}, \textbf{description}, \textbf{meta description} nebo \textbf{street}. Tím se snižuje dimenzionalita i riziko, že model bude pracovat s nerelevantním šumem.
-    \item \textbf{Podmíněná imputace a logická konzistence:} Pokud byt nemá lodžii nebo sklep, jsou odpovídající plochy (\textbf{loggia area m2}, \textbf{cellar area m2}) nastaveny na nulu. Chybějící \textbf{total area m2} je doplněna z \textbf{usable area m2} a zároveň se vytváří binární indikátor \textbf{total area m2 was missing}, který uchovává informaci o původní neúplnosti.
+    \item \textbf{Podmíněná imputace a logická konzistence:} Pokud byt nemá lodžii nebo sklep, jsou odpovídající plochy (\textbf{loggia area m2}, \textbf{cellar area m2}) nastaveny na nulu. Chybějící \textbf{total area m2} je doplněna z \textbf{usable area m2} a zároveň se vytváří binární indikátor \textbf{total area m2 was missing}, který uchovává informaci o původní neúplnosti. V~produkčním prostředí webové aplikace je však uživatel povinen zadat obě plošné hodnoty, takže tento příznak nabývá při ostré inferenci vždy hodnoty~0. Vzhledem k~marginální důležitosti tohoto příznaku v~modelu je dopad na predikci zanedbatelný.
     \item \textbf{Standardizace kategorií:} Dispozice v proměnné \textbf{category sub} jsou mapovány do jednotnější podoby. Větší dispozice \texttt{5+kk}, \texttt{5+1} a \texttt{6-a-vice} jsou z důvodu malého počtu pozorování sloučeny do skupiny \texttt{5+}, zatímco \texttt{atypicky} zůstává samostatnou kategorií.
     \item \textbf{Typová příprava proměnných:} Vybrané atributy jsou explicitně převedeny na kategoriální typ, například \texttt{category sub}, \textbf{ownership type}, \textbf{construction type}, \textbf{building condition}, \textbf{energy class} nebo \textbf{locality region id}. Regionální identifikátory jsou přitom zachovány jako řetězcové kategorie, nikoli jako spojité číselné proměnné.
     \item \textbf{Filtrace:} Ještě před samotným učením jsou odstraněny řádky s chybějící nebo nekladnou cílovou cenou nebo neplatnou plochou.
@@ -724,19 +709,19 @@ Aktuální pipeline předzpracování je rozdělena do dvou navazujících krok�
 
 \section*{Návrh pipeline předzpracování}
 
-Samotná pipeline předzpracování byla navržena odděleně pro jednotlivé skupiny příznaků podle jejich datového typu a role v modelu. Toto rozdělení umožňuje aplikovat na každý typ proměnných takový způsob zpracování, který nejlépe odpovídá jeho charakteru.
+Samotná pipeline předzpracování byla navržena odděleně pro jednotlivé skupiny příznaků podle jejich datového typu a role v modelu. Toto rozdělení aplikuje na každý typ proměnných takový způsob zpracování, který nejlépe odpovídá jeho charakteru.
 
 \begin{itemize}
-    \item \textbf{Numerické proměnné (Geografie a Plocha)}
+    \item \textbf{Numerické proměnné (Geografie, Plocha a Rok výstavby)}
     \begin{itemize}
-        \item \textbf{Postup:} Geografické proměnné \textbf{latitude}, \textbf{longitude} a plošné proměnné (\textbf{usable area m2}, \textbf{total area m2}, atd.) byly zpracovány pomocí imputace mediánem.
+        \item \textbf{Postup:} Geografické proměnné \textbf{latitude}, \textbf{longitude} a plošné proměnné (\textbf{usable area m2}, \textbf{total area m2}, atd.) byly zpracovány pomocí imputace mediánem. \textbf{construction year} je přirozeně numerická proměnná a byla standardizována pomocí \textbf{StandardScaler}.
         \item \textbf{Proč:} Medián je robustní vůči odlehlým hodnotám (outlierům), které se v realitních datech u ploch a souřadnic často vyskytují (např. chybně zadané výměry).
     \end{itemize}
 
     \item \textbf{Běžné kategoriální proměnné}
     \begin{itemize}
         \item \textbf{Postup:} Proměnné jako \textbf{category sub} či \textbf{ownership type} byly připraveny pro nativní kategoriální režim XGBoost (převod na \textit{pandas category}, normalizace řetězců, náhrada chybějících hodnot štítkem \textbf{missing}).
-        \item \textbf{Proč:} Nativní podpora kategorií v XGBoost je efektivnější než One-Hot kódování; snižuje paměťovou náročnost a umožňuje modelu lépe pracovat s vnitřním rozdělením stromů bez nárůstu dimenzionality.
+        \item \textbf{Proč:} Nativní podpora kategorií v XGBoost je efektivnější než One-Hot kódování; snižuje paměťovou náročnost a model lépe pracuje s vnitřním rozdělením stromů bez nárůstu dimenzionality.
     \end{itemize}
 
     \item \textbf{Binární proměnné}
@@ -754,19 +739,13 @@ Samotná pipeline předzpracování byla navržena odděleně pro jednotlivé sk
     \item \textbf{Strukturální proměnné}
     \begin{itemize}
         \item \textbf{Postup:} Proměnné \textbf{floor number} a \textbf{total floors} byly imputovány pomocí \textbf{KNNImputer} s parametrem $k = 5$.
-        \item \textbf{Proč:} Počet pater v budově není náhodný, ale souvisí s jinými parametry nemovitosti. Metoda KNN (K-nejbližších sousedů) odhaduje chybějící hodnoty na základě 5 nejpodobnějších záznamů \cite{Troyanskaya2001KNNImpute}, což je přesnější a robustnější než prostý průměr.
+        \item \textbf{Proč:} Počet pater v budově není náhodný, ale souvisí s jinými parametry nemovitosti. Metoda KNN (K-nejbližších sousedů) odhaduje chybějící hodnoty na základě 5 nejpodobnějších záznamů~\cite{Troyanskaya2001KNNImpute}, což je přesnější a robustnější než prostý průměr.
     \end{itemize}
 
     \item \textbf{Target encoded proměnné}
     \begin{itemize}
-        \item \textbf{Postup:} \textbf{district id} a \textbf{construction year} byly zpracovány pomocí \textbf{SmoothedTargetEncoder}.
+        \item \textbf{Postup:} \textbf{district id} byl zpracován pomocí \textbf{SmoothedTargetEncoder} (v rámci pipeline, která je při křížové validaci fitována samostatně v každém foldu pouze na trénovacích datech — encoder nikdy nevidí cílovou proměnnou validačního foldu, čímž se předchází úniku informací).
         \item \textbf{Proč:} U proměnných s vysokým počtem unikátních hodnot (vysoká kardinalita) by One-Hot kódování vytvořilo příliš mnoho sloupců. Target encoding nahradí kategorii průměrem cílové proměnné a vyhlazování (smoothing) zabraňuje přeučení u málo zastoupených kategorií.
-    \end{itemize}
-
-    \item \textbf{Spojení větví a filtrace}
-    \begin{itemize}
-        \item \textbf{Postup:} Využití \textbf{ColumnTransformer} s nastavením \texttt{remainder="drop"}.
-        \item \textbf{Proč:} Zajišťuje, že do modelu vstoupí pouze ty proměnné, které prošly definovanou pipeline. Všechny ostatní (např. redundantní ID nebo pomocné texty) jsou automaticky odstraněny, čímž se čistí vstupní data.
     \end{itemize}
 \end{itemize}
 
@@ -777,6 +756,8 @@ Finální varianta pro \textbf{XGBoost} záměrně nepoužívá \textbf{Standard
 \chapter{Modelování nabídkové ceny} \label{chap:implementation}
 
 Základní rodiny modelů byly testovány nad fixním trénovacím (11\,258 záznamů) a testovacím (1\,263 záznamů) vzorkem dat. Celý postup je navržen tak, aby výběr modelu probíhal výhradně na trénovací množině pomocí \textit{out-of-fold} cross-validace, zatímco testovací split je využit pouze jednou pro finální vyhodnocení zvoleného modelu.
+
+Na základě zjištění explorační analýzy -- pravostranné šikmosti rozdělení cen (viz~obr.~\ref{fig:prices_hist}), nelineárního vztahu mezi užitnou plochou a~cenou (viz~obr.~\ref{fig:price_area}) a~přítomnosti heteroskedasticity (viz~sekce~\ref{subsec:model_features}) -- je cílová proměnná modelována na logaritmické škále. Tato transformace linearizuje vztah cena–plocha, snižuje vliv odlehlých pozorování a~lze chyby interpretovat relativně, nikoli absolutně. Zpětný převod na korunovou škálu je zajištěn pomocí Duanova smearing estimatoru (viz~sekce~\ref{subsec:target_variable}). Stejný princip je aplikován i~na plošné atributy (\texttt{usable area m\textsuperscript{2}}, \texttt{total area m\textsuperscript{2}}, \texttt{loggia area m\textsuperscript{2}}, \texttt{cellar area m\textsuperscript{2}}), které vstupují do~modelu po~logaritmické transformaci.
 
 \section{Použité modely}
 \begin{table}[htbp]
@@ -796,7 +777,7 @@ Základní rodiny modelů byly testovány nad fixním trénovacím (11\,258 záz
 \texttt{cellar\_area\_m2} & numerická & plocha sklepa \\
 \texttt{floor\_number} & numerická & podlaží, ve kterém se byt nachází \\
 \texttt{total\_floors} & numerická & celkový počet podlaží budovy \\
-\texttt{construction\_year} & numerická & rok výstavby (target encoding) \\
+\texttt{construction\_year} & numerická & rok výstavby \\
 \texttt{has\_elevator} & binární & přítomnost výtahu \\
 \texttt{has\_terrace} & binární & přítomnost terasy \\
 \texttt{has\_garage} & binární & přítomnost garáže \\
@@ -818,57 +799,55 @@ Základní rodiny modelů byly testovány nad fixním trénovacím (11\,258 záz
 
 Tabulka~\ref{tab:feature_set} shrnuje základní sadu vstupních proměnných použitou při modelování. Pokud není v textu uvedeno jinak, všechny dále popsané modely vycházejí právě z této sady proměnných. Metodologický postup experimentu byl následující: (1)~porovnání pěti modelových frameworků na základních strukturovaných příznacích, (2)~výběr XGBoost jako nejvýkonnějšího kandidáta, (3)~obohacení o~prostorové POI příznaky, (4)~výběr nejinformativnějších POI příznaků pomocí forward selection a (5)~ladění hyperparametrů. Souhrnné výsledky všech modelů uvádí tabulka~\ref{tab:model_comparison_czech_republic}.
 
-\subsection{Globální medián}
-Jako nejjednodušší referenční model byl použit globální medián, který pro každý inzerát vrací medián ceny vypočtený z~trénovací množiny. Volba mediánu je vhodná vzhledem k~pravostranně šikmému rozdělení cen popsanému v~sekci~\ref{subsec:price_distribution}.
+\subsection*{Globální medián}
+Jako nejjednodušší referenční model byl použit globální medián, jehož princip je popsán v~sekci~\ref{subsec:baseline_models}. Volba mediánu je vhodná vzhledem k~pravostranně šikmému rozdělení cen popsanému v~sekci~\ref{subsec:price_distribution}.
 
-Tento baseline slouží jako základní benchmark — každý složitější model by měl tento výsledek překonat, protože využívá dodatečné strukturované informace o~nemovitosti.
+V cross-validačním vyhodnocení na trénovací části dat jde o jednoznačně nejslabší model z pohledu vysvětlené variability. Dosahuje přibližně \texttt{MedAPE = 0.3972} a záporného koeficientu determinace \(R^2 = -0{,}0515\). Skutečnost, že je hodnota \(R^2\) na trénovacích datech záporná, je přímým matematickým důsledkem asymetrie cen: zatímco jmenovatel ve výpočtu \(R^2\) měří rozptyl vůči aritmetickému průměru (minimalizace kvadratické chyby), tento baseline model predikuje medián (minimalizace absolutní chyby). Součet čtverců reziduí je tak u mediánu přirozeně vyšší než u průměru.
 
-V cross-validačním vyhodnocení na trénovací části dat jde o jednoznačně nejslabší model z pohledu vysvětlené variability. Dosahuje přibližně \texttt{MedAPE = 0.3972} a záporného koeficientu determinace \(R^2 = -0{,}0515\). Skutečnost, že je hodnota \(R^2\) na trénovacích datech záporná, je přímým matematickým důsledkem asymetrie cen: zatímco jmenovatel ve výpočtu \(R^2\) měří varianci vůči aritmetickému průměru (minimalizace kvadratické chyby), tento baseline model predikuje medián (minimalizace absolutní chyby). Součet čtverců reziduí je tak u mediánu přirozeně vyšší než u průměru.
-
-\subsection{Lineární model}
+\subsection*{Lineární model}
 Lineární model je v experimentu implementován jako \texttt{Linear regression on log-log scale}. Jeho finální podoba však byla zvolena až na základě srovnání několika variant. Postupně byly vyzkoušeny tři varianty: prostá lineární regrese na původní cenové škále bez log-transformace, lineární regrese s log-transformovanou cílovou proměnnou, a nakonec lineární regrese s log-transformovanou cílovou proměnnou i log-transformovanou užitnou plochou, resp. vybranými plošnými atributy.
 
-Výsledky srovnávací analýzy ukázaly, že lineární model na původní cenové škále je z testovaných lineárních variant nejslabší. Výrazné zlepšení přinesla již samotná log-transformace cílové proměnné, což odpovídá šikmosti rozdělení cen a přítomnosti heteroskedasticity z kapitoly \ref{subsec:price_distribution} . Další, již méně výrazné zlepšení pak poskytla log-transformace užitné plochy a příbuzných plošných atributů, která lépe zachytila nelineární vztah mezi velikostí bytu a jeho cenou. Finálně zvolený lineární model proto predikuje logaritmus ceny a preprocessing pipeline současně log-transformuje atributy \textbf{usable area m2} a \textbf{total area m2} (viz obr. \ref{fig:lin models}).
+Výsledky srovnávací analýzy ukázaly, že lineární model na původní cenové škále je z testovaných lineárních variant nejslabší. Výrazné zlepšení přinesla již samotná log-transformace cílové proměnné, což odpovídá šikmosti rozdělení cen a přítomnosti heteroskedasticity z kapitoly \ref{subsec:price_distribution} . Další, již méně výrazné zlepšení pak poskytla log-transformace užitné plochy a příbuzných plošných atributů, která lépe zachytila nelineární vztah mezi velikostí bytu a jeho cenou. Finálně zvolený lineární model proto predikuje logaritmus ceny a preprocessing pipeline současně log-transformuje atributy \textbf{usable area m2} a \textbf{total area m2} (viz obr. \ref{fig:lin_models}).
 
 
-\subsection{Ridge regrese}
+\subsection*{Ridge regrese}
 Dalším modelem v baseline rodině je \texttt{Ridge regression on log-log scale}. Z hlediska vstupní pipeline jde o stejný postup jako u lineární regrese, pouze s přidanou L2 regularizací (\(\alpha = 1{,}0\), výchozí hodnota dle~scikit-learn) v regresním kroku. Tento model je zařazen proto, aby bylo možné ověřit, zda mírná regularizace povede ke zlepšení stability a generalizace oproti obyčejné lineární regresi.
 
 Výsledky ukazují, že tento efekt je v použitém trénovacím datasetu velmi malý. Ridge je lineárnímu modelu bez regularizace velmi blízký, ale v OOF srovnání je nepatrně lepší než log-log lineární a na holdout testu se oba modely prakticky překrývají. V hlavním srovnávacím experimentu dosahuje ridge přibližně \texttt{MedAPE = 0.1761}, tedy téměř stejného výsledku jako lineární regrese, avšak stále výrazně horšího než stromové modely.
 
-\subsection{Rozhodovací strom}
-Dále byl vyzkoušen \texttt{Decision tree baseline}, tedy jednoduchý stromový model \cite{Breiman1984CART} nad stejnou skupinou strukturovaných atributů. Na rozdíl od lineární větve nevyžaduje stejné škálování numerických proměnných. Tento model reprezentuje nejjednodušší nelineární přístup v rámci experimentu.
+\subsection*{Rozhodovací strom}
+Dále byl vyzkoušen \texttt{Decision tree baseline}, tedy jednoduchý stromový model~\cite{Breiman1984CART} nad stejnou skupinou strukturovaných atributů. Tento model reprezentuje nejjednodušší nelineární přístup v experimentu.
 
 V OOF cross-validaci přináší zřetelné zlepšení oproti oběma lineárním variantám. Model dosahuje přibližně \texttt{MedAPE = 0.1453} a \texttt{R2 = 0.7784}. Rozhodovací strom tedy zachycuje více variability než lineární modely, avšak stále zůstává za nejsilnějším gradientně posilovaným ansámblem.
 
-\subsection{Gradientně posilované stromy}
+\subsection*{Gradientně posilované stromy}
 Nejvýkonnějším modelem v experimentu je \texttt{XGBoost baseline}. Tento model využívá stejnou strukturovanou preprocessing pipeline a současně vystupuje jako hlavní kandidát při výběru finálního baseline modelu. V rámci modelového srovnání je hodnocen ve stejném režimu jako ostatní modely a podle metriky \texttt{MedAPE} je vybrán jako finální referenční baseline.
 
-Na OOF cross-validaci dosahuje XGBoost přibližně \texttt{MedAPE = 0.0942} a \texttt{R2 = 0.8876}, což je výrazně lepší výsledek než u všech ostatních baseline modelů. Po natrénování na celé trénovací množině a vyhodnocení na testu pak dosahuje přibližně \texttt{MedAPE = 0.0855} a \texttt{R2 = 0.9151}. V experimentu tak vystupuje jako finálně zvolený referenční model pro další část práce.
+Na OOF cross-validaci dosahuje XGBoost přibližně \texttt{MedAPE = 0.0907} a \texttt{R2 = 0.8881}, což je výrazně lepší výsledek než u všech ostatních baseline modelů. Po natrénování na celé trénovací množině a vyhodnocení na testu pak dosahuje přibližně \texttt{MedAPE = 0.0855} a \texttt{R2 = 0.9151}. V experimentu tak vystupuje jako finálně zvolený referenční model pro další část práce.
 
 \section{Finální model}
 
-Z výsledků provedených experimentů byl jako výsledný model zvolen XGBoost. Tento model prokázal nejvyšší schopnost zachytit komplexní nelineární vztahy a interakce mezi strukturními a geografickými parametry nemovitostí. Pro dosažení optimální přesnosti byl model obohacen o informace POI které nebyly zahrnuty u baseline a podroben procesu expertního ladění hyperparametrů (fine-tuning) pro maximální výkonnost.
+Z výsledků provedených experimentů byl jako výsledný model zvolen XGBoost. Tento model prokázal nejvyšší schopnost zachytit komplexní nelineární vztahy a interakce mezi strukturními a geografickými parametry nemovitostí. Je vhodné upřesnit, že srovnávací baseline experiment (tab.~\ref{tab:model_comparison_czech_republic}) využívá 300 stromů, zatímco navazující POI experiment pracuje s 800 stromy a odlišnou konfigurací hyperparametrů. Pro dosažení optimální přesnosti byl model obohacen o informace POI, které nebyly zahrnuty u baseline a podroben procesu expertního ladění hyperparametrů (fine-tuning) pro maximální výkonnost.
 
 \subsection{Hyperparametry a strategie ladění}
-Nejprve byla základní architektura modelu zvolena porovnáním úvodní sady konfigurací pomocí 5-fold OOF validace. Namísto náhodného zkoušení byl definován prohledávací prostor pokrývající hlavní růstové strategie XGBoostu (hloubkový růst \texttt{depthwise} vs. listový růst \texttt{lossguide}), maximální hloubku stromu v intervalu \(D \in \{6, 8, 10, 12, \text{neomezeno}\}\), a různé úrovně regularizace počtu listů (až do \texttt{max\_leaves=63}). Z~tohoto porovnání vzešel jako výchozí baseline model XGBoost s \texttt{max\_depth=8}, \texttt{subsample=0{,}7} a~\texttt{n\_estimators=800} (viz tab.~\ref{tab:tuning_phases}). Následně bylo provedeno jemné ladění metodou GridSearchCV na modelu obohaceném o~POI příznaky. Optimální hyperparametry:
+Nejprve byla základní architektura modelu zvolena porovnáním úvodní sady konfigurací pomocí 5-fold OOF validace. Namísto náhodného zkoušení byl definován prohledávací prostor pokrývající hlavní růstové strategie XGBoostu (hloubkový růst \texttt{depthwise} vs. listový růst \texttt{lossguide}~\cite{ChenGuestrin2016XGBoost}), maximální hloubku stromu v intervalu \(D \in \{6, 8, 10, 12, \text{neomezeno}\}\), a různé úrovně regularizace počtu listů (až do \texttt{max leaves=63}). Z~tohoto porovnání vzešel jako výchozí baseline model XGBoost s \texttt{max depth=8}, \texttt{subsample=0{,}7} a~\texttt{n estimators=800} (viz tab.~\ref{tab:tuning_phases}). Následně bylo provedeno jemné ladění metodou GridSearchCV na modelu obohaceném o~POI příznaky. Optimální hyperparametry:
 
 \begin{itemize}
     \item \textbf{Počet stromů:} 800 s učícím koeficientem 0,025.
-    \item \textbf{Strategie růstu:} \texttt{lossguide} s maximálním počtem listů 63 a maximální hloubkou stromu 12 (\texttt{max\_depth~=~12}). GridSearchCV vyhodnotil hloubku 12 jako optimální ve srovnání s neomezenou hloubkou (\texttt{max\_depth~=~0}) i hodnotami 8 a 10.
-    \item \textbf{Regularizace a vzorkování:} \texttt{subsample~=~0,7}, \texttt{colsample\_bytree~=~0,8} a L2 regularizace (\texttt{reg\_lambda~=~1}).
+    \item \textbf{Strategie růstu:} \texttt{lossguide} s maximálním počtem listů 63 a maximální hloubkou stromu 12 (\texttt{max depth~=~12}). GridSearchCV vyhodnotil hloubku 12 jako optimální ve srovnání s neomezenou hloubkou (\texttt{max depth~=~0}) i hodnotami 8 a 10.
+    \item \textbf{Regularizace a vzorkování:} \texttt{subsample~=~0,7}, \texttt{colsample bytree~=~0,8} a L2 regularizace (\texttt{reg lambda~=~1}).
 \end{itemize}
 
 \begin{table}[htbp]
 \centering
 \caption{Porovnání výkonnosti XGBoost modelů na OOF CV}
 \label{tab:tuning_phases}
-\begin{tabular}{lccccc}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.2\linewidth}ccccc}
 \hline
-Model & \texttt{max\_depth} & \texttt{subsample} & \texttt{n\_estimators} & MedAPE (OOF) & \(R^2\) (OOF) \\
+Model & \texttt{max depth} & \texttt{n estimators} & MedAPE (OOF) & \(R^2\) (OOF) \\
 \hline
-Baseline XGBoost & 8 & 0{,}7 & 800 & 0{,}0942 & 0{,}8876 \\
-XGBoost + top-5 POI & 12 & 0{,}7 & 800 & 0{,}0867 & 0{,}9000 \\
+Baseline XGBoost & 12 & 800 & 0{,}0948 & 0{,}8938 \\
+XGBoost + top-5 POI & 12 & 800 & 0{,}0868 & 0{,}9006 \\
 \hline
 \end{tabular}
 \end{table}
@@ -881,15 +860,15 @@ XGBoost + top-5 POI & 12 & 0{,}7 & 800 & 0{,}0867 & 0{,}9000 \\
 \section{Zhodnocení experimentu s prostorovou infrastrukturou (POI)}
 \label{sec:poi_evaluation}
 
-V rámci snahy o maximalizaci predikčního výkonu byla navržena a implementována sada 5 rozšiřujících POI parametrů pro predikci cen bytů v České republice. Výsledky na nezávislé testovací sadě ukazují následující zjištění (viz tab.~\ref{tab:model_performance}):
+Pro maximalizaci predikčního výkonu byla navržena a implementována sada 5 rozšiřujících POI parametrů pro predikci cen bytů v České republice. Pomocí dopředného výběru příznaků (\textit{forward feature selection}) bylo identifikováno 5 prostorových atributů, které nejvíce přispívají ke~zlepšení přesnosti modelu: skóre kvality dopravního spojení (\texttt{transport quality score}), doba dojezdu do centra kraje (\texttt{city center travel time min}), vzdálenost k~nejbližší samoobsluze (\texttt{convenience nearest km}), průměrná vzdálenost ke~třem nejbližším potravinám (\texttt{grocery avg 3 nearest km}) a vzdálenost k~nejbližšímu supermarketu (\texttt{supermarket nearest km}). Výsledky na nezávislé testovací sadě ukazují následující zjištění (viz tab.~\ref{tab:model_performance}):
 
 \begin{enumerate}
-    \item Nejlepšího výkonu dosáhl doladěný POI model, který dosahuje \texttt{MedAPE = 0.0817} a potvrzuje tak mírné, avšak konzistentní zlepšení predikční přesnosti.
-    \item Oproti baseline modelu doladěný POI model snížil chybu MedAPE z 0.0855 na 0.0817, což představuje relativní zlepšení o přibližně $4{,}4\,\%$. 
-    \item Výsledky prokazují, že prostorové POI příznaky (např. kvalita dopravní obslužnosti či vzdálenost k občanské vybavenosti) nesou dodatečnou informační hodnotu nad rámec základních geografických identifikátorů, byť jejich absolutní přínos k redukci chyby je v kontextu již tak silného stromového modelu spíše inkrementální.
+    \item Nejlepšího výkonu dosáhl POI model s pěti top příznaky, který dosahuje \texttt{MedAPE = 0,0816} a potvrzuje tak výrazné a konzistentní zlepšení predikční přesnosti.
+    \item Oproti baseline modelu snížil POI model chybu MedAPE z 0,0879 na 0,0816, což je relativní zlepšení o přibližně $7{,}2\,\%$. Tento rozdíl je výrazně větší než u modelu se třemi základními POI příznaky, kde činilo zlepšení pouze $0{,}4\,\%$.
+    \item Výsledky prokazují, že prostorové POI příznaky (např. kvalita dopravní obslužnosti či vzdálenost k občanské vybavenosti) nesou dodatečnou informační hodnotu nad rámec základních geografických identifikátorů. Zejména kombinace skóre dopravní kvality a doby dojezdu do centra kraje významně rozšiřuje prediktivní sílu modelu.
 \end{enumerate}
 
-V~5-fold OOF cross-validaci dosáhl baseline XGBoost MedAPE~=~0{,}0942, zatímco model obohacený o~top-5 POI příznaky dosáhl MedAPE~=~0{,}0867, což představuje zlepšení o~+8{,}0~\% a R\textsuperscript{2}~=~0{,}9000 (viz tab.~\ref{tab:tuning_phases}).
+V~5-fold OOF cross-validaci dosáhl baseline XGBoost MedAPE~=~0{,}0948, zatímco model obohacený o~POI příznaky dosáhl MedAPE~=~0{,}0868, což je zlepšení o~+8{,}5~\% a R\textsuperscript{2}~=~0{,}9006 (viz tab.~\ref{tab:tuning_phases}).
 
 \begin{table}[htbp]
 \centering
@@ -897,15 +876,15 @@ V~5-fold OOF cross-validaci dosáhl baseline XGBoost MedAPE~=~0{,}0942, zatímco
 \label{tab:model_performance}
 \begin{tabular}{lccccc}
 \hline
-Model & MedAPE & MAPE & wMAPE & MAE [Kč] & $R^2$ \\
+Model & MedAPE & MAPE & wMAPE & $R^2$ \\
 \hline
-XGBoost tuned (no POI) & 0.0855 & 0.1327 & 0.1199 & 926\,916 & 0.9151 \\
-top-5 POI tuned & 0.0817 & 0.1262 & 0.1175 & 908\,512 & 0.9157 \\
+XGBoost bez POI & 0{,}0879 & 0{,}1340 & 0{,}1200  & 0{,}9125 \\
+POI model (5 top příznaků) & 0{,}0816 & 0{,}1259 & 0{,}1166  & 0{,}9147 \\
 \hline
 \end{tabular}
 \end{table}
 
-Skutečnost, že chybová metrika na testovací sadě (MedAPE = $0{,}0855$ pro~baseline) vyšla nepatrně příznivěji než odhad z~křížové validace na trénovací množině (MedAPE = $0{,}0942$), nepředstavuje metodologickou chybu, nýbrž přirozený důsledek rozptylu při náhodném rozdělení dat (tzv.~\textit{hold-out variance}). Testovací vzorek mohl náhodně obsáhnout o~něco vyšší podíl standardních, snadněji predikovatelných bytových jednotek bez extrémních cenových anomálií. Z~akademického hlediska je klíčové zjištění, že nedošlo k~degradaci predikčního výkonu, což spolehlivě vyvrací podezření na přeučení (overfitting) modelu. Wilcoxonův párový test navíc potvrdil, že pozorované snížení mediánové absolutní procentuální chyby je statisticky signifikantní ($p = 0{,}0069$). Bootstrapový 95\,\% interval spolehlivosti pro rozdíl MedAPE ($[-0{,}0005,\;0{,}0052]$) potvrzuje trend ke~zlepšení, ačkoliv jeho dolní mez mírně zasahuje do~záporných hodnot.
+Skutečnost, že chybová metrika na testovací sadě (MedAPE = $0{,}0879$ pro~baseline) vyšla nepatrně příznivěji než odhad z~křížové validace na trénovací množině (MedAPE = $0{,}0948$), nepředstavuje metodologickou chybu. Zatímco každý fold v~rámci křížové validace trénuje model pouze na~$\frac{4}{5}$ trénovací množiny ($\approx 9\,006$ pozorování), finální model je natrénován na~všech 11\,258 záznamech. Větší trénovací vzorek přirozeně vede k~lepší generalizaci, což vysvětluje mírně příznivější hodnoty na testovací sadě. Model s~pěti POI příznaky dosáhl na testovací sadě MedAPE~=~$0{,}0816$, což je o~$7{,}2\,\%$ lepší výsledek než baseline. Z~akademického hlediska je podstatné, že nedošlo k~degradaci predikčního výkonu, což spolehlivě vyvrací podezření na přeučení (overfitting) modelu.
 
 Budoucí práce by se mohla zaměřit na rozšíření POI dat o další kategorie 
 (restaurace, školy, parky, zdravotnická zařízení) s využitím 
@@ -923,21 +902,22 @@ Dosazením zkalibrované hodnoty získáváme multiplikativní koeficienty pro p
     \mathrm{LB}_* &= \hat{y}_* \cdot e^{-0{,}1257} \approx \hat{y}_* \cdot 0{,}8819 \implies -11{,}81\,\% \\
     \mathrm{UB}_* &= \hat{y}_* \cdot e^{0{,}1257} \approx \hat{y}_* \cdot 1{,}1339 \implies +13{,}39\,\%
 \end{align*}
+Uvedená kalibrace je aplikována jednotně napříč celým cenovým spektrem. Vzhledem k~identifikované heteroskedasticitě (viz sekce~\ref{subsec:price_distribution}) by přesnější pokrytí mohla poskytnout podmíněná (Mondrianova) konformní predikce kalibrovaná zvlášť pro jednotlivé cenové segmenty; toto rozšíření zůstává předmětem budoucí práce.
 
 \section{Interpretace výsledků}
 
 \subsection{Globální interpretace modelu XGBoost}
 
-Globální interpretace modelu XGBoost byla provedena pomocí metriky \textit{feature importance} založené na ukazateli \textit{gain}. Z grafu důležitosti příznaků (viz obr.~\ref{fig:XGB_gain}) je patrné, že se model při predikci nejvíce opírá o lokalizační proměnné. Dominantní roli má zejména target-enkódovaná proměnná \textbf{okres (district id)}, významná je také proměnná \textbf{kraj (locality region id)}. Tento výsledek potvrzuje, že poloha nemovitosti je pro odhad nabídkové ceny klíčová a že model efektivně využívá regionální a okresní členění trhu. Druhou významnou skupinu tvoří plošné charakteristiky, zejména \textbf{total area m\textsuperscript{2}} a \textbf{usable area m\textsuperscript{2}}, což odpovídá očekávání, že velikost bytu patří mezi hlavní determinanty ceny.
+Globální interpretace modelu XGBoost byla provedena pomocí metriky \textit{feature importance} založené na ukazateli \textit{gain}. Z grafu důležitosti příznaků (viz obr.~\ref{fig:XGB_gain}) je patrné, že se model při predikci nejvíce opírá o lokalizační proměnné. Dominantní roli má zejména proměnná \textbf{kraj (locality region id)} s hodnotou gain 43{,}8~\%, následovaná proměnnou \textbf{total area m\textsuperscript{2}} s 6{,}7~\% a \textbf{usable area m\textsuperscript{2}} s 2{,}8~\%.
 
-Středně významné jsou dále proměnné popisující stav a typ nemovitosti, například \textbf{stav budovy (building condition)}, \textbf{typ vlastnictví (ownership type)} a \textbf{dispozice (category sub)}. Menší, ale stále nenulový přínos mají některé binární charakteristiky vybavení, například \textbf{výtah (has elevator)}, \textbf{terasa (has terrace)} nebo \textbf{garáž (has garage)}. Naopak zeměpisné souřadnice \textbf{latitude} a \textbf{longitude} mají v tomto konkrétním modelu relativně nízký přínos. Pravděpodobným vysvětlením je, že podstatná část informace o poloze je již zachycena diskrétními lokalizačními proměnnými \textbf{okres (district id)} a \textbf{kraj (locality region id)}.
+Středně významné jsou dále proměnné popisující stav a typ nemovitosti, například \textbf{stav budovy (building condition)}, \textbf{typ vlastnictví (ownership type)} a \textbf{dispozice (category sub)}. Menší, ale stále nenulový přínos mají některé binární charakteristiky vybavení, například \textbf{výtah (has elevator)}, \textbf{terasa (has terrace)} nebo \textbf{garáž (has garage)}. Naopak zeměpisné souřadnice \textbf{latitude} a \textbf{longitude} mají v tomto konkrétním modelu relativně nízký přínos. Pravděpodobným vysvětlením je, že podstatná část informace o poloze je již zachycena diskrétními lokalizačními proměnnými \textbf{kraj (locality region id)} a \textbf{okres (district id)}.
 
 Tuto interpretaci podporuje i doplňkový experiment bez diskrétních lokalizačních proměnných. Po jejich odstranění význam zeměpisných souřadnic u modelu XGBoost výrazně vzrostl, protože model začal souřadnice využívat jako náhradní zdroj informace o poloze.
 
 \subsection{SHAP a interpretace baseline modelu}
-Pro účely globální interpretace a zajištění transparentnosti byl analyzován primárně \textbf{baseline model XGBoost} (bez POI příznaků). Tento postup byl zvolen záměrně, neboť baseline model zachycuje fundamentální cenotvorbu odvozenou výhradně ze strukturovaných vlastností bytu a základních geografických identifikátorů, což poskytuje stabilnější a snáze interpretovatelný referenční rámec pro koncového uživatele.
+Pro účely globální interpretace a zajištění transparentnosti byl analyzován primárně \textbf{baseline model XGBoost} (bez POI příznaků). Tento postup byl zvolen záměrně, neboť baseline model zachycuje základní cenotvorbu odvozenou výhradně ze strukturovaných vlastností bytu a základních geografických identifikátorů, což poskytuje stabilnější a snáze interpretovatelný referenční rámec pro koncového uživatele.
 
-Ze souhrnného SHAP grafu tohoto modelu (viz obr.~\ref{fig:bee_shap}) vyplývá, že mezi nejdůležitější proměnné patří zejména příznak \textbf{okres (district id)}, dále \textbf{užitná plocha (usable area m\textsuperscript{2})} a \textbf{celková plocha (total area m\textsuperscript{2})}.
+Ze souhrnného SHAP grafu tohoto modelu (viz obr.~\ref{fig:bee_shap}) vyplývá, že mezi nejdůležitější proměnné patří zejména příznak \textbf{kraj (locality region id)}, dále \textbf{užitná plocha (usable area m\textsuperscript{2})} a \textbf{celková plocha (total area m\textsuperscript{2})}.
 
 Podobně lze interpretovat i plošné charakteristiky. U~proměnných \textbf{užitná plocha} a~\textbf{celková plocha} je zřejmé, že vyšší hodnoty obvykle zvyšují predikovanou cenu, zatímco menší byty mají tendenci působit opačně. Tento vztah se projevil i v lokálních interpretacích vybraných predikcí, kde byt o výměře 110~m\textsuperscript{2} vykazoval výrazně pozitivní příspěvek těchto proměnných, zatímco u bytu o velikosti 47~m\textsuperscript{2} byl jejich vliv negativní.
 
@@ -945,13 +925,22 @@ Významný je rovněž příznak \textbf{podlaží (floor number)}. Z dependence
 
 Vedle dominantních faktorů se v modelu uplatňují také další charakteristiky, například stavební stav, přítomnost výtahu, terasa, typ vlastnictví nebo přesná geografická poloha. Jejich vliv je však ve srovnání s lokalitou a velikostí bytu zpravidla menší. Celkově lze tedy uzavřít, že model při predikci ceny kombinuje především silný lokalizační efekt s informací o velikosti nemovitosti, zatímco ostatní atributy slouží spíše k jemnějšímu zpřesnění výsledného odhadu.
 
+\subsection{Vliv POI příznaků na predikci}
+Pro ověření přínosu prostorových příznaků byla provedena SHAP analýza i~na finálním modelu obohaceném o~top-5 POI příznaky, natrénovaném na~celé trénovací množině a~vyhodnoceném na~testovací sadě (1\,263 pozorování). Na rozdíl od~výše popsaného baseline modelu zde vystupují do~popředí zejména metriky dopravní obslužnosti a~dostupnosti center.
+
+Největší střední absolutní SHAP hodnotu (0{,}1944) si ponechává příznak \textbf{kraj (locality region id)}. Na~druhém místě se však nově umísťuje \textbf{skóre kvality dopravy (transport quality score)} s~hodnotou 0{,}1136, následované užitnou plochou (0{,}1012). Čtvrtou pozici zaujímá \textbf{doba jízdy do~centra kraje (city center travel time min)} s~hodnotou 0{,}0999, čímž se řadí mezi nejsilnější prediktory modelu.
+
+Zbývající POI příznaky  \textbf{průměrná vzdálenost ke~3 nejbližším obchodům (grocery avg 3 nearest km, 0{,}0186)}, \textbf{vzdálenost k~nejbližší samoobsluze (convenience nearest km, 0{,}0097)} a~\textbf{vzdálenost k~nejbližšímu supermarketu (supermarket nearest km)}  vykazují sice nižší SHAP hodnoty, avšak jejich souhrnný efekt doplňuje obraz o~lokální občanské vybavenosti.
+
+Výsledky SHAP analýzy na POI modelu tak potvrzují, že prostorové příznaky nenesou pouze inkrementální zlepšení predikční přesnosti (viz tab.~\ref{tab:model_performance}), ale že některé z~nich -- zejména dostupnost hromadné dopravy a~vzdálenost k centru patří mezi strukturálně nejvýznamnější vstupy modelu.
+
 \newpage{}
 
 \begin{figure}[htbp]
 \centering
     \includegraphics[width=1\linewidth]{images/linmodels.png}
     \caption{Srovnání lineárních modelů na transformovaných škálách}
-    \label{fig:lin models}
+    \label{fig:lin_models}
 \end{figure}
 
 
@@ -989,7 +978,7 @@ Vedle dominantních faktorů se v modelu uplatňují také další charakteristi
 \toprule
 Model & MedAPE & MAPE & wMAPE & MAE [Kč] & $R^2$ & $n$ \\
 \midrule
-XGBoost baseline & 0.0942 & 0.1458 & 0.1314 & 1\,031\,201 & 0.8876 & 11\,258 \\
+XGBoost baseline & 0.0907 & 0.1417 & 0.1291 & 1\,013\,175 & 0.8881 & 11\,258 \\
 Decision tree baseline & 0.1453 & 0.2240 & 0.1957 & 1\,536\,516 & 0.7784 & 11\,258 \\
 Ridge regression on log-log scale & 0.1761 & 0.2562 & 0.2170 & 1\,703\,629 & 0.7503 & 11\,258 \\
 Linear regression on log-log scale & 0.1762 & 0.2563 & 0.2171 & 1\,703\,964 & 0.7504 & 11\,258 \\
@@ -1010,14 +999,14 @@ Global median & 0.3972 & 0.6257 & 0.4749 & 3\,727\,539 & -0.0515 & 11\,258 \\
 \centering
     \includegraphics[width=1\linewidth]{images/shap2.png}
     \caption{Příklad predikce na větším bytu}
-    \label{shap2}
+    \label{fig:shap2}
 \end{figure}
 
 
 \begin{figure}[htbp]
 \centering
     \includegraphics[width=1\linewidth]{images/shap3.png}
-    \caption{Dependency plot SHAP hodnot v závislosti na patře (znázorňuje výrazně nižsí cenu u bytů v prvním patře)}
+    \caption{Dependency plot SHAP hodnot v závislosti na patře (znázorňuje výrazně nižší cenu u bytů v prvním patře)}
     \label{fig:floor_shap}
 \end{figure}
 
@@ -1029,7 +1018,12 @@ Global median & 0.3972 & 0.6257 & 0.4749 & 3\,727\,539 & -0.0515 & 11\,258 \\
     \label{fig:bee_shap}
 \end{figure}
 
-
+\begin{figure}[htbp]
+\centering
+    \includegraphics[width=1\linewidth]{images/shap_poi.png}
+    \caption{Beeswarm plot top 15 proměnných s největším příspěvkem na tvorbě ceny u POI XGBoost}
+    \label{fig:bee_shap_poi}
+\end{figure}
 
 %---------------------------------------------------------------
 \chapter{Implementace webové aplikace}
@@ -1042,45 +1036,45 @@ Tato kapitola se podrobně zabývá architekturou, návrhem a implementací webo
 
 Aplikace je rozdělena na backend (serverová logika) a frontend (klient v prohlížeči), které komunikují prostřednictvím REST API. Toto oddělení umožňuje nezávislý vývoj, škálování a nasazení jednotlivých částí.
 
-\subsection{Vrstvená architektura}
+\subsection*{Vrstvená architektura}
 Systém je členěn do čtyř logických vrstev:
 \begin{itemize}
-    \item \textbf{Prezentační vrstva (frontend)} -- jednostránková webová aplikace v HTML5, CSS3 a JavaScriptu, využívající knihovny Leaflet.js \cite{LeafletJS} pro interaktivní mapu, Turf.js \cite{TurfJS} pro geografické výpočty a Plotly.js \cite{PlotlyJS} pro vizualizaci výsledků.
-    \item \textbf{Aplikační vrstva (backend)} -- implementována v Pythonu pomocí mikrorámce Flask~3.0 \cite{Flask}, který přijímá požadavky, validuje vstupy, volá doménovou logiku a vrací strukturovanou JSON odpověď.
+    \item \textbf{Prezentační vrstva (frontend)} -- jednostránková webová aplikace v HTML5, CSS3 a JavaScriptu, využívající knihovny Leaflet.js~\cite{LeafletJS} pro interaktivní mapu, Turf.js~\cite{TurfJS} pro geografické výpočty a Plotly.js~\cite{PlotlyJS} pro vizualizaci výsledků.
+    \item \textbf{Aplikační vrstva (backend)} -- implementována v Pythonu pomocí mikrorámce Flask~3.0~\cite{Flask}, který přijímá požadavky, validuje vstupy, volá doménovou logiku a vrací strukturovanou JSON odpověď.
     \item \textbf{Doménová vrstva} -- obsahuje výpočetní jádro aplikace: natrénovaný model XGBoost, výpočet POI příznaků (PoiHelper), preprocessingovou pipeline a extrakci SHAP hodnot. Je oddělena od aplikační logiky pro nezávislé testování a aktualizaci.
-    \item \textbf{Infrastrukturní vrstva} -- zajišťuje běh aplikace v produkčním prostředí pomocí kontejnerizace (Docker \cite{Docker}), správy závislostí a proměnných prostředí.
+    \item \textbf{Infrastrukturní vrstva} -- zajišťuje běh aplikace v produkčním prostředí pomocí kontejnerizace (Docker~\cite{Docker}), správy závislostí a proměnných prostředí.
 \end{itemize}
 
-\subsection{Životní cyklus požadavku a API kontrakt}
+\subsection*{Životní cyklus požadavku a API kontrakt}
 Komunikace mezi klientskou a serverovou částí probíhá bezstavově pomocí protokolu HTTP/HTTPS přes rozhraní REST API. Životní cyklus jednoho predikčního cyklu na pozadí probíhá v následujících fázích:
 \begin{enumerate}
     \item \textbf{Příjem a serverová validace:} Server přijme strukturovaný JSON payload na endpointu \texttt{/predict}. Aplikace implementuje striktní defenzivní logiku, která vynucuje přítomnost přesně 23~požadovaných příznaků a provádí explicitní typovou konverzi (přetypování na \texttt{float}/\texttt{int} a sanitaci řetězců), čímž eliminuje riziko neočekávaného selhání doménového jádra. Pokud libovolný parametr chybí, požadavek je odmítnut s~kódem \texttt{400 Bad Request} s~výčtem chybějících polí. Dále je ověřeno, že GPS souřadnice spadají do~území České republiky.
-    \item \textbf{Obohacení dat (Runtime POI):} Na základě zadaných GPS souřadnic server vypočte pět prostorových příznaků: BallTree dotazy pro vzdálenosti k~zastávkám MHD a~obchodům, OSRM API \cite{OSRM} pro výpočet jízdní doby do~centra krajského města (s~Haversine fallbackem při výpadku) a~spojitý výpočet skóre kvality dopravy.
-    \item \textbf{Inference a transformace:} Vektor příznaků projde preprocessingovou pipeline (imputace, kódování, target encoding) a~XGBoost model vrátí predikci na logaritmické škále. Ta je převedena zpět na korunovou škálu pomocí Duanova smearing estimatoru \cite{Duan1983Smearing}.
+    \item \textbf{Obohacení dat (Runtime POI):} Na základě zadaných GPS souřadnic server vypočte pět prostorových příznaků: BallTree dotazy pro vzdálenosti k~zastávkám MHD a~obchodům, OSRM API~\cite{OSRM} pro výpočet jízdní doby do~centra krajského města (s~Haversine fallbackem při výpadku) a~spojitý výpočet skóre kvality dopravy.
+    \item \textbf{Inference a transformace:} Vektor příznaků projde preprocessingovou pipeline (imputace, kódování, target encoding) a~XGBoost model vrátí predikci na logaritmické škále. Ta je převedena zpět na korunovou škálu pomocí Duanova smearing estimatoru~\cite{Duan1983Smearing}.
     \item \textbf{Kalibrace a výpočet SHAP:} Na transformovaný bodový odhad je aplikován post-predikční kalibrační pipeline. Paralelně s tím jsou extrahovány lokální aditivní příspěvky (SHAP) a konformní meze spolehlivosti.
     \item \textbf{Odeslání odpovědi:} Server zkompiluje odpověď obsahující finální kalibrovanou cenu, intervaly a pole strukturovaných SHAP hodnot.
 \end{enumerate}
 
 
-\subsection{Inicializace}
-Z důvodu minimalizace latence je klíčové, aby model a doprovodné datové struktury nebyly načítány dynamicky při každém HTTP požadavku. Třída \texttt{PredictLoader} je instancována jednou při startu aplikace na~úrovni modulu; načte serializovaný XGBoost model, parametry čištění dat, inicializuje prostorové indexy BallTree pro výpočet POI a~připraví XGBoost booster pro extrakci SHAP hodnot. Instance je následně sdílena mezi všemi požadavky.
+\subsection*{Inicializace}
+Z důvodu minimalizace latence je důležité, aby model a doprovodné datové struktury nebyly načítány dynamicky při každém HTTP požadavku. Třída \texttt{PredictLoader} je instancována jednou při startu aplikace na~úrovni modulu; načte serializovaný XGBoost model, parametry čištění dat, inicializuje prostorové indexy BallTree pro výpočet POI a~připraví XGBoost booster pro extrakci SHAP hodnot. Instance je následně sdílena mezi všemi požadavky.
 
-\subsection{Kontejnerizace a nasazení}
+\subsection*{Kontejnerizace a nasazení}
 Pro reprodukovatelnost a snadné nasazení je backend zabalen do Docker kontejneru. \texttt{Dockerfile} definuje základní image (\texttt{python:3.12-slim}), instalaci závislostí z \texttt{requirements.txt}, kopírování zdrojových kódů a modelových souborů a spouštěcí příkaz. Pro orchestraci služeb je použit \texttt{docker-compose.yml}, který definuje mapování portů, připojení datových svazků (modely, CSV soubory) jako read-only a proměnné prostředí. Modelové soubory jsou do kontejneru připojeny jako externí volume, což umožňuje aktualizaci modelu bez přestavby celého image.
 
 
 \section{Uživatelské rozhraní}
 \label{sec:frontend}
 
-Uživatelské rozhraní (UI) je realizováno jako responzivní jednostránková webová aplikace postavená na kombinaci standardů HTML5, CSS3 bez nutnosti stahovat robustní frontendové rámce, což drasticky snižuje čas do prvního vykreslení. Vstupní formulář je hierarchicky rozdělen do čtyř logických bloků pomocí sémantických značek \texttt{<fieldset>}:
+Uživatelské rozhraní (UI) je realizováno jako responzivní jednostránková webová aplikace postavená na standardech HTML5, CSS3 a JavaScriptu, bez nutnosti stahovat robustní frontendové rámce, což výrazně snižuje čas do prvního vykreslení. Vstupní formulář je hierarchicky rozdělen do čtyř logických bloků pomocí sémantických značek \texttt{<fieldset>}:
 \begin{itemize}
     \item \textbf{Lokalita:} Obsahuje skryté vstupy pro zeměpisnou šířku a délku, které jsou plněny interakcí s mapou, a kaskádové výběrové seznamy pro kraj a okres.
-    \item \textbf{Dispozice a plocha:} Textové a číselné vstupy s omezujícími atributy pro užitnou plochu ($m^2$), celkovou plochu, typ dispozice a specifické výměry doplňkových prostor (lodžie, sklep).
+    \item \textbf{Dispozice a plocha:} Textové a číselné vstupy s omezujícími atributy pro užitnou plochu ($\mathrm{m}^2$), celkovou plochu, typ dispozice a specifické výměry doplňkových prostor (lodžie, sklep).
     \item \textbf{Stav budovy a vlastnictví:} Ordinační škály pro stavebně-technický stav, energetickou náročnost budovy (třídy PENB A--G) a typ vlastnictví.
     \item \textbf{Vybavení a příslušenství:} Pole binárních přepínačů reprezentujících přítomnost výtahu, garáže, terasy či stav zařízenosti nábytkem.
 \end{itemize}
 
-Klientská komponenta provádí asynchronní validaci na události \texttt{input} a \texttt{change}. Implementovaná pravidla hlídají fyzikální a doménové absurdity:
+Klientská komponenta provádí asynchronní validaci na události \texttt{input} a \texttt{change}. Implementovaná pravidla kontrolují logickou konzistenci zadaných hodnot, konkrétně:
 \begin{equation}
     A_{\text{užitná}} \le A_{\text{celková}},
 \end{equation}
@@ -1095,12 +1089,12 @@ Při inicializaci aplikace je na pozadí asynchronně stažen topologicky vyči�
 
 Výsledek predikce je následně uživateli zobrazen ve formě přehledného panelu, který obsahuje bodový odhad ceny, přepočet na metr čtvereční a predikční interval (viz obr.~\ref{fig:app_front}).
 
-\subsection{Zpracování odpovědi a chybové stavy}
-Frontend korektně reaguje na všechny typy HTTP odpovědí. Při úspěšné predikci (HTTP~200) jsou extrahována data o ceně, intervalu spolehlivosti a SHAP hodnotách, které jsou okamžitě vykresleny do výsledkového panelu. Při chybě validace (HTTP~400) je uživateli zobrazena srozumitelná chybová zpráva (např. „Souřadnice jsou mimo území České republiky") při zachování dříve zadaných hodnot formuláře. Během čekání na odpověď serveru je tlačítko odeslání deaktivováno a zobrazuje se indikátor načítání, čímž je zamezeno odeslání duplicitních požadavků.
+\subsection*{Zpracování odpovědi a chybové stavy}
+Frontend korektně reaguje na všechny typy HTTP odpovědí. Při úspěšné predikci (HTTP~200) jsou extrahována data o ceně, intervalu spolehlivosti a SHAP hodnotách, které jsou okamžitě vykresleny do výsledkového panelu. Při chybě validace (HTTP~400) je uživateli zobrazena srozumitelná chybová zpráva (např. \uv{Souřadnice jsou mimo území České republiky}) při zachování dříve zadaných hodnot formuláře. Během čekání na odpověď serveru je tlačítko odeslání deaktivováno a zobrazuje se indikátor načítání, čímž je zamezeno odeslání duplicitních požadavků.
 
 \section{Interpretace a kvantifikace nejistoty}
 \label{sec:interpretace_nejistota}
-Data transformovaná na serveru jsou odeslána v JSON odpovědi. Klientská vrstva extrahuje pole \texttt{shap\_values}, seřadí příspěvky podle jejich absolutní velikosti a pomocí knihovny \textbf{Plotly.js} vygeneruje interaktivní waterfall graf (\textit{waterfall chart}). Graf vizuálně startuje na hodnotě $Y_{\text{baseline}}$ a postupně přičítá/odečítá jednotlivé procentní segmenty, až dosáhne finální odhadované ceny $Y$ (viz obr.~\ref{fig:app_shap}). Výpočet asymetrického konformního intervalu a konkrétní hodnota kalibračního kvantilu $q_{0{,}80}$ jsou podrobně popsány v~sekci~\ref{sec:model_calibration}.
+Data transformovaná na serveru jsou odeslána v JSON odpovědi. Klientská vrstva extrahuje pole \texttt{shap values}, seřadí příspěvky podle jejich absolutní velikosti a pomocí knihovny \textbf{Plotly.js} vygeneruje interaktivní waterfall graf (\textit{waterfall chart}). Graf vizuálně startuje na hodnotě $Y_{\text{baseline}}$ a postupně přičítá/odečítá jednotlivé procentní segmenty, až dosáhne finální odhadované ceny $Y$ (viz obr.~\ref{fig:app_shap}). Výpočet asymetrického konformního intervalu a konkrétní hodnota kalibračního kvantilu $q_{0{,}80}$ jsou podrobně popsány v~sekci~\ref{sec:model_calibration}.
 
 \begin{figure}[htbp]
     \centering
@@ -1112,7 +1106,7 @@ Data transformovaná na serveru jsou odeslána v JSON odpovědi. Klientská vrst
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth]{images/shap.png}
-    \caption{Interaktivní vodopádový graf (SHAP waterfall chart) vygenerovaný knihovnou Plotly.js na frontendu, vizualizující multiplikativní procentuální příspěvky jednotlivých parametrů k finální odhadované ceně bytu.}
+    \caption{Interaktivní waterfall graf vygenerovaný knihovnou Plotly.js na frontendu, vizualizující multiplikativní procentuální příspěvky jednotlivých parametrů k finální odhadované ceně bytu.}
     \label{fig:app_shap}
 \end{figure}
 %---------------------------------------------------------------
@@ -1124,12 +1118,12 @@ Kapitola popsala architekturu webové aplikace od backendu (vrstvená architektu
 
 Cílem této bakalářské práce bylo navrhnout a ověřit postup pro odhad nabídkových cen bytů v České republice na základě strukturovaných dat z realitních inzerátů a prostorových informací. Práce zahrnovala celý analytický proces od automatizovaného sběru dat, přes explorační analýzu, až po návrh, trénování a vyhodnocení robustních predikčních modelů nasazených ve webové aplikaci.
 
-Porovnání modelů prokázalo, že zatímco lineární přístupy poskytují solidní interpretovatelný základ, pokročilé metody strojového učení (XGBoost) lépe zachycují nelineární vztahy a interakce. Prokazatelným přínosem práce je integrace prostorové infrastruktury (POI). Obohacení modelu o metriky jako je kvalita dopravní obslužnosti či vzdálenost k občanské vybavenosti snížilo mediánovou chybu odhadu (MedAPE) o přibližně $4{,}4\,\%$ oproti baseline modelu. Ačkoliv se jedná o inkrementální zlepšení, potvrzuje to, že lokální dostupnost služeb hraje v cenotvorbě měřitelnou roli.
+Porovnání modelů prokázalo, že zatímco lineární přístupy poskytují solidní interpretovatelný základ, pokročilé metody strojového učení (XGBoost) lépe zachycují nelineární vztahy a interakce. Prokazatelným přínosem práce je integrace prostorové infrastruktury (POI). Obohacení modelu o metriky, jako je kvalita dopravní obslužnosti či vzdálenost k občanské vybavenosti, snížilo mediánovou chybu odhadu (MedAPE) o přibližně $7{,}2\,\%$ na nezávislé testovací sadě oproti baseline modelu. Ačkoliv se jedná o inkrementální zlepšení, potvrzuje to, že lokální dostupnost služeb hraje v cenotvorbě měřitelnou roli.
 
-Využití SHAP hodnot nad referenčním modelem navíc poskytlo transparentní vhled do logiky odhadů, kde dominantní roli hraje kombinace makro-lokality (okres) a plošných dispozic, sekundovaná stavem budovy a doplňkovým vybavením. 
+Využití SHAP hodnot nad referenčním modelem navíc poskytlo transparentní vhled do logiky odhadů, kde dominantní roli hraje kombinace makro-lokality (okres) a plošných dispozic, doplněná o stav budovy a doplňkové vybavení. 
 
-Praktickým výstupem práce je vytvoření plně kontejnerizovaného, reprodukovatelného ekosystému, který zpřístupňuje komplexní model strojového učení skrze responzivní webové rozhraní s integrovanou asymetrickou kvantifikací nejistoty. V navazujícím výzkumu by bylo vhodné obohatit prostorové indexy o hlubší demografická data či analyzovat nestrukturované vizuální informace z půdorysů bytových jednotek pro přesnější zachycení mikrolokálních anomálií.
+Praktickým výstupem práce je vytvoření plně kontejnerizovaného, reprodukovatelného systému, který zpřístupňuje komplexní model strojového učení skrze responzivní webové rozhraní s integrovanou asymetrickou kvantifikací nejistoty. V navazujícím výzkumu by bylo vhodné obohatit prostorové indexy o hlubší demografická data či analyzovat nestrukturované vizuální informace z půdorysů bytových jednotek pro přesnější zachycení mikrolokálních anomálií. Pro~přesnější kvantifikaci přínosu nelineárních modelů by bylo rovněž vhodné doplnit benchmark zohledňující lokalitu (např.~mediánovou cenu za~$\mathrm{m}^2$ v~daném okrese vynásobenou užitnou plochou), který by nastavil realističtější dolní mez predikčního výkonu než globální medián.
 
-Ačkoliv dosažené výsledky potvrzují vysokou predikční schopnost navrženého řešení, je nutné kriticky zhodnotit jeho přirozené limity. Vzhledem k tomu, že sběr dat proběhl jednorázově, datová sada představuje průřezový řez trhem, který nedokáže zachytit dynamiku úrokových sazeb či sezónnost. Nejvýznamnějším omezením současného modelu je však absence vizuálních informací o interiéru. Model vnímá čerstvě a luxusně zrekonstruovaný byt identicky jako byt vyžadující rozsáhlejší investice, pokud oba inzeráty formálně udávají stav „velmi dobrý". Tato sémantická mezera v datech tvoří podstatnou část nevysvětlené variability cen a představuje hlavní zdroj predikčních odchylek v luxusnějším segmentu.
+Dosažené výsledky jsou zatíženy několika omezeními. Především byl sběr dat proveden pouze jednorázově, není proto schopen zachytit vývoj trhu v čase, například změny úrokových sazeb, ekonomických podmínek nebo sezónní výkyvy poptávky. Dalším významným omezením je absence vizuálních informací o stavu a kvalitě interiéru nemovitostí v podobě fotografií. Model tak nedokáže rozlišit mezi čerstvě a nadstandardně zrekonstruovaným bytem a bytem vyžadujícím rozsáhlejší rekonstrukci, pokud oba inzeráty uvádějí stejnou kategorii stavu, například „velmi dobrý“. Tato mezera představuje významný zdroj rozdílu cen, zejména u nemovitostí ve vyšším cenovém segmentu.
 %---------------------------------------------------------------
       

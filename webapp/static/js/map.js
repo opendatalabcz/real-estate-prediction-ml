@@ -89,7 +89,7 @@ fetch('/api/boundaries')
     boundaryFeatures = data.features;
     boundaryReady = true;
 
-    // Compute centroid of each district using turf
+    // Compute interior center for each district (centroid, fallback to pointOnFeature)
     const regionPoints = {};
     data.features.forEach(f => {
       const did = f.properties.district_id;
@@ -97,9 +97,12 @@ fetch('/api/boundaries')
       if (!district) return;
       const rid = district.locality_region_id;
       try {
-        const centroid = turf.centroid(f);
-        const lng = centroid.geometry.coordinates[0].toFixed(5);
-        const lat = centroid.geometry.coordinates[1].toFixed(5);
+        let center = turf.centroid(f);
+        if (!turf.booleanPointInPolygon(center, f)) {
+          center = turf.pointOnFeature(f);
+        }
+        const lng = center.geometry.coordinates[0].toFixed(5);
+        const lat = center.geometry.coordinates[1].toFixed(5);
         districtCenters[did] = [lat, lng];
         if (!regionPoints[rid]) regionPoints[rid] = [];
         regionPoints[rid].push([parseFloat(lng), parseFloat(lat)]);
